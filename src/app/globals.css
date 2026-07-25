@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+/*
+ * Sistema de tokens "Luz Suave" — ver NATAOROGON-BRAND-STYLE-GUIDE.md.
+ * Capa 1 (@theme): rampas tonales con hex crudos.
+ * Capa 2 (@theme inline): roles semánticos que referencian la rampa.
+ * Regla: los componentes SOLO usan roles (bg-primary, text-on-surface…);
+ * las utilidades de rampa (oro-*, rosa-*…) solo se permiten en este archivo
+ * y en los assets SVG de src/components/shared/svg/.
+ */
+
+@theme {
+  /* ── Rampa Oro (Gold) ── */
+  --color-oro-50: #fbf3e3;
+  --color-oro-100: #f5e6c8;
+  --color-oro-200: #edd6a0;
+  --color-oro-300: #e4c378;
+  --color-oro-400: #dcb55c;
+  --color-oro-500: #d4a94a;
+  --color-oro-600: #bc8f3a;
+  --color-oro-700: #a9762f;
+  --color-oro-800: #8c5f26;
+  --color-oro-900: #6b4a23;
+
+  /* ── Rampa Rosa Taupe ── */
+  --color-rosa-50: #fbf0ee;
+  --color-rosa-100: #f5dad5;
+  --color-rosa-200: #eabdb5;
+  --color-rosa-300: #dfa095;
+  --color-rosa-400: #d48d80;
+  --color-rosa-500: #c57f72;
+  --color-rosa-600: #b5766b;
+  --color-rosa-700: #99615a;
+  --color-rosa-800: #7a4c46;
+  --color-rosa-900: #5c3833;
+
+  /* ── Rampa Arena (Sand) ── */
+  --color-arena-50: #fdf8f2;
+  --color-arena-100: #faeee0;
+  --color-arena-200: #f3dfc7;
+  --color-arena-300: #e9c9a6;
+  --color-arena-400: #ddb284;
+  --color-arena-500: #ce9a65;
+  --color-arena-600: #b37f4c;
+  --color-arena-700: #8f6339;
+  --color-arena-800: #6b4a2a;
+  --color-arena-900: #47301c;
+
+  /* ── Rampa Café/Marfil (neutral de marca; "cafe" para no pisar la escala neutral de Tailwind) ── */
+  --color-cafe-50: #ffffff;
+  --color-cafe-100: #fbf7ef;
+  --color-cafe-200: #f2e9dc;
+  --color-cafe-300: #e3d6c4;
+  --color-cafe-400: #c9b39c;
+  --color-cafe-500: #a68f79;
+  --color-cafe-600: #83685a;
+  --color-cafe-700: #5f473c;
+  --color-cafe-800: #3a2e2a;
+  --color-cafe-900: #241c19;
+
+  /* ── Funcionales (en familia con la paleta cálida, no rojo/verde genérico) ── */
+  --color-success: #7c9473;
+  --color-on-success: #ffffff;
+  --color-error: #a85c4a;
+  --color-on-error: #ffffff;
+
+  /* ── Tipografía ── */
+  --font-ceremonial: var(--font-cormorant), serif;
+  --font-display: var(--font-fraunces), serif;
+  --font-body: var(--font-inter), sans-serif;
+}
+
+@theme inline {
+  /* ── Roles semánticos (mapa del brand guide) ── */
+  --color-primary: var(--color-rosa-600);
+  --color-on-primary: var(--color-cafe-50);
+  --color-primary-container: var(--color-rosa-100);
+  --color-on-primary-container: var(--color-rosa-900);
+  --color-secondary: var(--color-oro-700);
+  --color-on-secondary: var(--color-cafe-50);
+  --color-secondary-container: var(--color-oro-100);
+  --color-tertiary: var(--color-arena-500);
+  --color-on-tertiary: var(--color-cafe-800);
+  --color-surface: var(--color-cafe-100);
+  --color-surface-variant: var(--color-cafe-200);
+  --color-on-surface: var(--color-cafe-800);
+  --color-on-surface-variant: var(--color-cafe-700);
+  --color-outline: var(--color-cafe-400);
+  --color-outline-variant: var(--color-cafe-300);
+}
+
+:root {
+  /* Los ÚNICOS dos gradientes de la página (ver brand guide):
+     oro = logo + linework ceremonial · cta = botón primario Luz Suave */
+  --gradient-gold: linear-gradient(135deg, #a9762f 0%, #d4a94a 100%);
+  --gradient-cta: linear-gradient(135deg, #e9c9a6 0%, #b5766b 100%);
+}
+
+@utility gradient-gold {
+  background-image: var(--gradient-gold);
+}
+@utility gradient-cta {
+  background-image: var(--gradient-cta);
+}
+
+/* Voz ceremonial: uppercase + tracking amplio, como la portada de la guía */
+@utility ceremonial-label {
+  font-family: var(--font-ceremonial);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* El header sticky no debe tapar los destinos de ancla */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Animación de energía (Reporte Energético)
+   --progress (0..1) lo escribe useScrollProgress sobre la sección;
+   data-state ("idle" | "activating" | "form") lo escribe el phase
+   machine de EnergyReportSection. Todo lo visual se resuelve aquí.
+   ══════════════════════════════════════════════════════════════════ */
+
+.energy-flow {
+  --progress: 0;
+}
+
+/* Capa fantasma: el mandala completo, apenas insinuado (estado "incompleto") */
+.energy-flow .fol-ghost {
+  color: var(--color-oro-200);
+  opacity: 0.35;
+}
+
+/* Capa de dibujado: cada anillo se traza según --progress, con stagger
+   centro→afuera. pathLength=1 en el SVG hace que esto sea pura aritmética. */
+.energy-flow .fol-draw circle {
+  stroke-dasharray: 1;
+}
+.energy-flow .fol-draw .fol-g1 circle {
+  stroke-dashoffset: clamp(0, calc(1 - var(--progress) / 0.4), 1);
+}
+.energy-flow .fol-draw .fol-g2 circle {
+  stroke-dashoffset: clamp(0, calc(1 - (var(--progress) - 0.15) / 0.45), 1);
+}
+.energy-flow .fol-draw .fol-g3 circle {
+  stroke-dashoffset: clamp(0, calc(1 - (var(--progress) - 0.3) / 0.55), 1);
+}
+.energy-flow .fol-draw .fol-g4 circle {
+  stroke-dashoffset: clamp(0, calc(1 - (var(--progress) - 0.5) / 0.5), 1);
+}
+
+/* Motas: aparecen escalonadas contra el progreso del scroll */
+.energy-flow .mote {
+  opacity: clamp(0, calc((var(--progress) - var(--stagger)) * 2.5), 1);
+}
+
+/* Fase activa (tras el CTA): el linework "respira" con un brillo que
+   recorre los trazos, y las motas derivan en bucles suaves */
+@keyframes stroke-shimmer {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+@keyframes mote-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate(var(--dx, 6px), var(--dy, -10px));
+    opacity: 1;
+  }
+}
+
+[data-state="activating"] .energy-flow .fol-draw circle,
+[data-state="form"] .energy-flow .fol-draw circle {
+  stroke-dasharray: 0.85 0.15;
+  stroke-dashoffset: 0;
+  animation: stroke-shimmer 3.2s linear infinite;
+}
+[data-state="activating"] .energy-flow .mote,
+[data-state="form"] .energy-flow .mote {
+  opacity: 1;
+  animation: mote-drift var(--dur, 7s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* Transición de contenido: el intro se despide al activar; el form entra */
+@keyframes fade-up-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.report-intro {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+[data-state="activating"] .report-intro {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+.report-form-enter {
+  animation: fade-up-in 0.6s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .energy-flow,
+  .energy-flow *,
+  .report-intro,
+  .report-form-enter {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+  /* Contenido nunca oculto tras la animación: mandala completo, motas visibles */
+  .energy-flow {
+    --progress: 1;
+  }
+  .energy-flow .mote {
+    opacity: 0.8;
+  }
+}

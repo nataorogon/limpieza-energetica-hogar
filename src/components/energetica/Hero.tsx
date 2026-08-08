@@ -30,9 +30,7 @@ export default function Hero() {
           {/* 24px mínimo: el dorado de marca da 3.66:1 sobre el fondo crema, que
               cumple AA solo como texto grande (≥24px). A 20px incumpliría. */}
           <p className="mt-6 max-w-lg font-display text-2xl leading-snug text-on-surface-variant lg:text-3xl">
-            con un método de limpieza basado en{" "}
-            <em className="not-italic text-secondary">Registros Akáshicos</em> y
-            activado con{" "}
+            con un protocolo de limpieza energética activado con{" "}
             <em className="not-italic text-secondary">Lenguajes de Luz</em>.
           </p>
 

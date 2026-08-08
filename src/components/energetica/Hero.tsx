@@ -21,10 +21,9 @@ export default function Hero() {
             <em className="not-italic text-secondary">energía de tu hogar</em>.
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-on-surface-variant sm:text-lg">
-            Programa guiado de 7 días con audio-activaciones de Lenguajes de
-            Luz, canalizadas por Nata Orogón, para liberar la energía densa de
-            tu casa y volver a sentirla como tu refugio. Sin rituales
-            complicados. Sin experiencia previa. Solo 15 minutos al día.
+            Recupera la paz en tu hogar en 7 días con un metodo de limpieza basado en Registros Akashikos y activado
+            con Lenguajes de Luz. 
+            Libera la energía densa de tu casa y vuelve a sentirla como tu refugio, sin rituales complicados, sin experiencia previa y con solo 15 minutos al día.
           </p>
           {/* Un solo CTA: el Reporte Energético es ahora la sección inmediata
               siguiente, así que un botón que baje hasta él solo compite. */}

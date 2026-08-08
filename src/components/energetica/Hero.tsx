@@ -43,12 +43,18 @@ export default function Hero() {
           <p className="ceremonial-label mt-4 max-w-md text-xs font-semibold leading-relaxed text-on-surface-variant sm:text-sm">
             Sin rituales complicados · Sin experiencia previa · 15 minutos al día
           </p>
-          {/* Un solo CTA: el Reporte Energético es ahora la sección inmediata
-              siguiente, así que un botón que baje hasta él solo compite. */}
+          {/* El CTA del hero lleva al Reporte, NO a la oferta: el tráfico llega
+              de anuncios, o sea frío, y saltar al precio se brinca las ocho
+              secciones que argumentan. Quien ya viene decidido no pierde nada
+              —el header es sticky y su botón apunta a #oferta en todo scroll—
+              y quien no, deja su correo en vez de irse sin dejar rastro. */}
           <div className="mt-8">
-            <CtaButton href="#oferta" variant="primary" size="lg">
-              Comenzar mi limpieza de 7 días
+            <CtaButton href="#reporte" variant="primary" size="lg">
+              Conocer la energía de mi hogar
             </CtaButton>
+            <p className="mt-3 text-xs text-on-surface-variant">
+              Gratis · 10 preguntas · tu resultado al instante
+            </p>
           </div>
         </div>
         {/* La foto lleva al pie la frase que antes era el titular. Sirve dos

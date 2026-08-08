@@ -160,6 +160,12 @@ body {
 section[id] {
   scroll-margin-top: 5rem;
 }
+/* Excepción: el Reporte es un riel con panel pegado. Si lo dejamos 5rem más
+   abajo, el pin arranca desplazado y el primer tiempo entra descuadrado.
+   Aquí el destino correcto es el borde exacto del riel. */
+#reporte {
+  scroll-margin-top: 0;
+}
 
 /* ══════════════════════════════════════════════════════════════════
    Animación de energía (Reporte Energético)

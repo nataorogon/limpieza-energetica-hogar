@@ -130,7 +130,7 @@ export default function EnergyReportSection() {
           {/* Mismo tratamiento que el titular anterior: es el tercer tiempo de
               la misma frase, no una nota al pie. */}
           <p className="font-display text-2xl font-medium leading-tight text-on-surface sm:text-4xl">
-            ¿Has verificado alguna vez qué energía habita en tu casa?
+            ¿Has verificado alguna vez qué energía habita en tu hogar?
           </p>
           <form
             className="mt-10"

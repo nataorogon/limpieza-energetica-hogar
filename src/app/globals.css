@@ -247,6 +247,13 @@ section[id] {
   height: 100dvh;
   width: 100%;
   overflow: hidden;
+  /* Vaciado del panel antes de que se despegue. Un panel pegado deja de estarlo
+     al llegar al fondo de su riel, y en ese instante lo que tenga puesto sube
+     junto con la página: el mandala mide 72dvh, así que su mitad inferior
+     quedaba encima de la sección siguiente y las dos se leían encimadas.
+     Se apaga el fondo en el último tramo para que el panel se suelte vacío.
+     Solo el fondo — el formulario y el CTA siguen enteros hasta el final. */
+  --salida: clamp(0, calc((var(--progress) - 0.88) / 0.12), 1);
 }
 
 /* El mandala crece con el scroll — y SIEMPRE completo: el lado base está
@@ -258,7 +265,7 @@ section[id] {
   --crecimiento: clamp(0, calc(var(--progress) / 0.68), 1);
   width: var(--lado);
   height: var(--lado);
-  opacity: calc(0.85 - 0.3 * var(--crecimiento));
+  opacity: calc((0.85 - 0.3 * var(--crecimiento)) * (1 - var(--salida, 0)));
   transform: scale(calc(0.4 + 0.6 * var(--crecimiento)))
     rotate(calc(var(--crecimiento) * 20deg));
   /* z-index explícito + pointer-events: will-change/transform crean stacking
@@ -272,6 +279,8 @@ section[id] {
 .report-pin .report-scrim {
   position: relative;
   z-index: 1;
+  /* Se va con el mandala: un lavado radial sobre fondo vacío se nota. */
+  opacity: calc(1 - var(--salida, 0));
 }
 
 /* Cada texto entra y sale por su ventana [--desde, --hasta], con una rampa a

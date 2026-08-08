@@ -36,8 +36,8 @@ export default function LenguajesDeLuz() {
             música te emociona sin que analices las notas.
           </p>
           <p>
-            En este programa, cada activación fue canalizada específicamente
-            para una capa energética del hogar:
+            En este programa hay una activación canalizada por cada una de las
+            7 capas del hogar, y todas hacen el mismo trabajo de fondo:
           </p>
           <ul className="space-y-2 pl-1">
             {CAPAS.map((capa) => (

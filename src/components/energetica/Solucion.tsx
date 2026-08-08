@@ -45,9 +45,9 @@ export default function Solucion() {
             <strong className="text-on-surface">
               Limpieza Energética del Hogar
             </strong>{" "}
-            es un proceso guiado de 7 días que limpia, capa por capa, la
-            energía acumulada de tu casa — y la sella con protección para que
-            el resultado se sostenga.
+            es un proceso guiado de 7 días que limpia, una capa por día, las 7
+            capas de energía que carga un hogar — y lo sella con protección
+            para que el resultado se sostenga.
           </p>
           <ul className="space-y-2 text-on-surface">
             <li>No es un curso que tienes que estudiar.</li>
@@ -63,8 +63,9 @@ export default function Solucion() {
             </strong>
           </p>
           <p>
-            Día a día, habitación por habitación, capa por capa: al séptimo día
-            tu casa no se siente igual. Y tú tampoco.
+            Día a día, capa por capa — desde lo que quedó atado al espacio
+            hasta el terreno donde está construida tu casa: al séptimo día tu
+            hogar no se siente igual. Y tú tampoco.
           </p>
         </div>
         <div className="mt-8">

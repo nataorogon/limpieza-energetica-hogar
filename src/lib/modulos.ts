@@ -8,7 +8,12 @@
  *  - `tema`   — neutro, es el que se muestra MIENTRAS se diagnostica. Decirle
  *               "presencia de muertos" a alguien antes de preguntarle si oye
  *               ruidos condiciona la respuesta y arruina el diagnóstico.
- *  - `nombre` — el real, se revela solo en el reporte, ya con las respuestas dadas.
+ *  - `nombre` — el real. Se usa en el reporte (ya con las respuestas dadas) y
+ *               en la landing, donde es justamente lo que vende.
+ *
+ * Este archivo es la ÚNICA fuente del programa: la landing (Plan, Problema) y
+ * el Reporte leen de aquí. Si los 7 días y los 7 módulos vuelven a divergir,
+ * es porque alguien escribió la lista a mano en otro lado.
  */
 
 export type ModuloId =
@@ -29,8 +34,14 @@ export type Modulo = {
   tema: string;
   nombre: string;
   pregunta: string;
-  /** Exactamente 3: el puntaje se calcula sobre cuántas se marcan. */
+  /**
+   * Exactamente 3: el puntaje se calcula sobre cuántas se marcan.
+   * La PRIMERA es además la que la landing muestra en "¿Tu casa se siente
+   * pesada?" — pon siempre de primera la más reconocible sin contexto.
+   */
   senales: [Senal, Senal, Senal];
+  /** Qué hace la activación de ese día. Es la línea de tiempo de la landing. */
+  resumenPlan: string;
   queEs: string;
   /** Lo que produce cuando está activo — el "This may contribute to" del reporte. */
   consecuencias: string[];
@@ -53,6 +64,8 @@ export const MODULOS: Modulo[] = [
         texto: "Me levanto asustada, como si alguien me estuviera observando",
       },
     ],
+    resumenPlan:
+      "Liberamos lo que quedó atado al espacio y lo acompañamos a irse. Es la capa que más rápido se nota al dormir.",
     queEs:
       "Cuando alguien muere —en tu hogar o en el de un vecino— puede quedarse rondando el lugar. Queda atado al espacio hasta que se hace una limpieza que lo libere. Las reliquias y los objetos heredados suelen sostener ese vínculo sin que nadie lo sepa.",
     consecuencias: [
@@ -82,6 +95,8 @@ export const MODULOS: Modulo[] = [
           "En casa hay cuadros, posters o altares de artistas o figuras que admiramos",
       },
     ],
+    resumenPlan:
+      "Cortamos el alimento de lo que se instaló y desanclamos sus puntos de apoyo en la casa.",
     queEs:
       "En los hogares donde se consume pornografía o cine de terror, o donde se adora a artistas y figuras —sobre todo si ya murieron— se forman entidades que se alimentan de esa energía de adoración. Cuadros, posters y postales son su punto de anclaje. Las drogas dentro del hogar abren la misma puerta.",
     consecuencias: [
@@ -105,13 +120,16 @@ export const MODULOS: Modulo[] = [
       },
       {
         id: "hablar-mal",
-        texto: "Dentro de casa se habla mal de la pareja, del jefe o de una misma",
+        texto:
+          "Dentro de casa se habla mal de la pareja, del jefe o de una misma",
       },
       {
         id: "pesadez",
         texto: "Después de discutir, el ambiente queda pesado por días",
       },
     ],
+    resumenPlan:
+      "Disolvemos lo que se dijo y se pensó entre estas paredes, y que quedó cargando cada espacio.",
     queEs:
       "Todo lo que pensamos y decimos crea formas de pensamiento. Cuando hablas mal de tu pareja, de tu jefe o de ti misma dentro de tu casa, esas formas no se van: se quedan cargando los espacios donde se dijeron.",
     consecuencias: [
@@ -131,14 +149,18 @@ export const MODULOS: Modulo[] = [
     senales: [
       {
         id: "rabia-dirigida",
-        texto: "Hay rabia o resentimiento dirigido a esta casa o a quien vive en ella",
+        texto:
+          "Hay rabia o resentimiento dirigido a esta casa o a quien vive en ella",
       },
       {
         id: "proyectos-caen",
-        texto: "De un momento a otro se caen todos los proyectos, uno tras otro",
+        texto:
+          "De un momento a otro se caen todos los proyectos, uno tras otro",
       },
       { id: "vecinos", texto: "Tengo o tuve problemas con los vecinos" },
     ],
+    resumenPlan:
+      "Extraemos las espadas clavadas —celos, envidias, rabias dirigidas— y cerramos lo que las sostenía.",
     queEs:
       "Los celos, las envidias, las rabias y las iras dirigidas a un hogar no se disipan solas. La ira es una espada: se lanza y se clava en el espacio, y ahí queda, sosteniendo el conflicto desde adentro.",
     consecuencias: [
@@ -170,6 +192,8 @@ export const MODULOS: Modulo[] = [
         texto: "Tengo objetos regalados o heredados de los que no sé el origen",
       },
     ],
+    resumenPlan:
+      "Limpiamos objetos, instalación eléctrica y estructura de la energía que traen de afuera.",
     queEs:
       "Un objeto carga la energía de quien lo fabricó y de quien te lo regaló. Entra a tu casa con todo eso puesto. La instalación eléctrica y los campos electromagnéticos suman su propia carga sobre la estructura.",
     consecuencias: [
@@ -189,14 +213,20 @@ export const MODULOS: Modulo[] = [
     senales: [
       {
         id: "abandonado",
-        texto: "Hay un cuarto útil, clóset o depósito muy desordenado o abandonado",
+        texto:
+          "Hay un cuarto útil, clóset o depósito muy desordenado o abandonado",
       },
-      { id: "antigua", texto: "La casa es antigua o tuvo muchos habitantes antes" },
+      {
+        id: "antigua",
+        texto: "La casa es antigua o tuvo muchos habitantes antes",
+      },
       {
         id: "movimiento",
         texto: "Escucho movimiento en zonas donde no hay nadie",
       },
     ],
+    resumenPlan:
+      "Cerramos las puertas que llevan años abiertas: cuartos útiles, clósets, rincones abandonados.",
     queEs:
       "Los portales se abren donde el espacio lleva mucho tiempo sin atención: hogares muy antiguos, cuartos útiles abandonados, clósets en desorden profundo. Son las puertas por donde entran las entidades, y quedan abiertas hasta que alguien las cierra.",
     consecuencias: [
@@ -215,12 +245,17 @@ export const MODULOS: Modulo[] = [
     pregunta: "¿Algo de esto describe tu situación?",
     senales: [
       { id: "bloqueo", texto: "Los proyectos se me bloquean sin explicación" },
-      { id: "estafas", texto: "He tenido estafas o pérdidas de dinero inesperadas" },
+      {
+        id: "estafas",
+        texto: "He tenido estafas o pérdidas de dinero inesperadas",
+      },
       {
         id: "vuelve",
         texto: "La pesadez vuelve aunque limpie la casa una y otra vez",
       },
     ],
+    resumenPlan:
+      "Limpiamos el terreno y lo reasignamos: deja de ser lo que fue y pasa a ser tu hogar.",
     queEs:
       "Toda casa está construida sobre un terreno, y la mayoría de los terrenos están contaminados: fueron campos de batalla, hubo personas enterradas ahí, o fueron asignados como campos sagrados donde se iba a orar. Ese terreno se limpia y se reasigna: deja de ser lo que fue y pasa a ser hogar.",
     consecuencias: [

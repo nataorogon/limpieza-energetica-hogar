@@ -30,6 +30,10 @@ const PREGUNTAS = [
     a: "Inmediatamente después de tu compra, en tu correo. Hoy mismo puedes hacer tu primera activación. El acceso es de por vida: puedes repetir el proceso cuantas veces quieras.",
   },
   {
+    q: "¿Y si alguna de las 7 capas no aplica a mi casa?",
+    a: "Se trabaja igual, y no sobra. Las 7 capas están en todo hogar: lo que cambia es cuánta carga tiene cada una. Donde no hay nada que liberar, la activación de ese día funciona como mantenimiento y sellado de esa capa. Si quieres saber cuáles están más cargadas en tu casa antes de empezar, haz tu Reporte Energético gratis.",
+  },
+  {
     q: "¿Y si me atraso un día?",
     a: "No pasa nada. El programa queda tuyo para siempre y lo retomas donde lo dejaste. Lo ideal son 7 días seguidos, pero el proceso se adapta a tu ritmo.",
   },

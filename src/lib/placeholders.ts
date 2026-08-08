@@ -16,7 +16,7 @@ export const PENDING = {
       {
         nombre: "Programa “7 Días de Limpieza Energética del Hogar”",
         descripcion:
-          "7 audio-activaciones canalizadas en Lenguajes de Luz, una por día, cada una para una capa de tu hogar. Acceso inmediato y de por vida, desde cualquier dispositivo.",
+          "7 audio-activaciones canalizadas en Lenguajes de Luz, una por día: presencias, entidades, formas de pensamiento, espadas de ira, objetos y estructuras, portales, y reasignación del terreno. Acceso inmediato y de por vida.",
         valor: "US$97", // TODO: valor real
       },
       {
@@ -28,7 +28,7 @@ export const PENDING = {
       {
         nombre: "Activación de Sellado y Protección del Hogar",
         descripcion:
-          "La culminación del día 7, para que la limpieza se sostenga en el tiempo.",
+          "El cierre del proceso, con las 7 capas ya liberadas, para que la limpieza se sostenga en el tiempo.",
         valor: "US$47", // TODO: valor real
       },
     ],

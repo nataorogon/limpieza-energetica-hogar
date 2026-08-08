@@ -1,13 +1,13 @@
 import GoldDivider from "@/components/shared/GoldDivider";
+import { MODULOS } from "@/lib/modulos";
 
-const SENALES = [
-  "Ambientes tensos o cargados en ciertas habitaciones.",
-  "Cansancio constante que no se explica con tu rutina.",
-  "Discusiones que se repiten siempre en el mismo lugar.",
-  "Insomnio o sueño que no repara, aunque duermas horas.",
-  "Estancamiento: proyectos, dinero o ánimo que no fluyen desde una mudanza, una ruptura o una mala época.",
-  "Sensación de incomodidad, de “no estar sola”, o de querer irte de tu propia casa.",
-];
+/**
+ * Una señal por capa, en el orden del programa: es la señal principal de cada
+ * módulo (senales[0] en src/lib/modulos.ts). Así la persona reconoce en la
+ * landing exactamente las mismas frases que después le pregunta el Reporte —
+ * y cada viñeta de esta lista tiene un día del programa que la resuelve.
+ */
+const SENALES = MODULOS.map((m) => m.senales[0].texto);
 
 /** Secciones 2 + 3 — Apertura (tobogán resbaladizo) + El problema. */
 export default function Problema() {
@@ -51,7 +51,8 @@ export default function Problema() {
           ¿Tu casa se siente pesada?
         </h2>
         <p className="mt-4 text-base text-on-surface-variant sm:text-lg">
-          Tal vez has notado:
+          Tal vez has notado alguna de estas siete señales — una por cada capa
+          de energía que carga un hogar:
         </p>
         <ul className="mt-6 space-y-3">
           {SENALES.map((senal) => (
@@ -70,7 +71,8 @@ export default function Problema() {
           <p>
             Si marcaste aunque sea una, sigue leyendo. Porque nada de esto es
             casualidad, y ninguna de estas señales se resuelve con más limpieza
-            física.
+            física. Cada una viene de una capa distinta, y cada capa tiene su
+            propio día en el programa.
           </p>
           <p className="text-on-surface">
             <strong>El verdadero problema tiene nombre: energía densa

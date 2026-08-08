@@ -1,6 +1,7 @@
 import CtaButton from "@/components/shared/CtaButton";
 import GoldDivider from "@/components/shared/GoldDivider";
 import SectionEyebrow from "@/components/shared/SectionEyebrow";
+import { MODULOS } from "@/lib/modulos";
 
 const PASOS = [
   {
@@ -11,55 +12,12 @@ const PASOS = [
   {
     titulo: "Escucha un audio al día.",
     texto:
-      "15 minutos, con audífonos, en el espacio que ese día trabajas. El audio te guía; tú respiras.",
+      "15 minutos, con audífonos, en un espacio tranquilo de tu casa. El audio te guía; tú respiras.",
   },
   {
     titulo: "Siente tu hogar renacer.",
     texto:
-      "Al día 7, tu casa queda limpia, armonizada, sellada y protegida. Y tú sabes cuidarla desde entonces.",
-  },
-];
-
-const DIAS = [
-  {
-    dia: "Día 1",
-    titulo: "Tu dormitorio.",
-    texto:
-      "Empezamos donde duermes: la victoria más rápida. Esta misma noche notarás la diferencia al descansar.",
-  },
-  {
-    dia: "Día 2",
-    titulo: "La entrada y los umbrales.",
-    texto: "Por donde todo entra: personas, energías, intenciones.",
-  },
-  {
-    dia: "Día 3",
-    titulo: "Los espacios compartidos.",
-    texto: "Sala y comedor: donde la convivencia deja sus huellas.",
-  },
-  {
-    dia: "Día 4",
-    titulo: "La cocina y el alimento.",
-    texto:
-      "El día que nadie espera — y el que más transforma la energía cotidiana.",
-  },
-  {
-    dia: "Día 5",
-    titulo: "Rincones, objetos y memorias.",
-    texto:
-      "Lo guardado, lo heredado, lo olvidado: los depósitos silenciosos de energía densa.",
-  },
-  {
-    dia: "Día 6",
-    titulo: "Limpieza profunda de todo el espacio.",
-    texto:
-      "La activación más potente del programa, con todas las capas anteriores ya liberadas.",
-  },
-  {
-    dia: "Día 7",
-    titulo: "Sellado y protección.",
-    texto:
-      "Cerramos, armonizamos y protegemos tu hogar para que lo logrado se sostenga.",
+      "Al día 7 tu casa queda limpia capa por capa, reasignada como tu hogar y sellada para que se sostenga.",
   },
 ];
 
@@ -103,21 +61,27 @@ export default function Plan() {
         <h2 className="font-display text-3xl font-medium text-on-surface sm:text-4xl">
           7 días. 7 capas. Un hogar nuevo.
         </h2>
+        <p className="mt-4 text-base leading-relaxed text-on-surface-variant sm:text-lg">
+          Cada día trabaja una capa distinta, en este orden exacto — porque
+          cada una sostiene a la siguiente:
+        </p>
+        {/* Un solo origen: estos son los mismos 7 módulos que puntúa el
+            Reporte Energético (src/lib/modulos.ts). */}
         <ol className="mt-10 space-y-6 border-l border-outline-variant pl-6">
-          {DIAS.map((d) => (
-            <li key={d.dia} className="relative">
+          {MODULOS.map((m) => (
+            <li key={m.id} className="relative">
               <span
                 aria-hidden="true"
                 className="absolute -left-[27px] top-2 h-2 w-2 rounded-full bg-secondary"
               />
               <p className="ceremonial-label text-xs font-semibold text-secondary">
-                {d.dia}
+                Día {m.numero}
               </p>
               <h3 className="mt-1 font-display text-lg font-medium text-on-surface">
-                {d.titulo}
+                {m.nombre}
               </h3>
               <p className="mt-1 text-sm leading-relaxed text-on-surface-variant sm:text-base">
-                {d.texto}
+                {m.resumenPlan}
               </p>
             </li>
           ))}
@@ -126,6 +90,16 @@ export default function Plan() {
           Todos los audios son diferentes, progresivos y quedan tuyos para
           siempre: puedes repetir el proceso completo en cada mudanza, inicio
           de ciclo o etapa difícil.
+        </p>
+        <p className="mt-6 text-base leading-relaxed text-on-surface-variant sm:text-lg">
+          ¿No sabes cuál de las 7 capas está más cargada en tu casa?{" "}
+          <a
+            href="#reporte"
+            className="font-medium text-secondary underline underline-offset-4 hover:text-on-surface"
+          >
+            Haz tu Reporte Energético gratis
+          </a>{" "}
+          y te decimos por dónde empezar.
         </p>
       </div>
     </section>

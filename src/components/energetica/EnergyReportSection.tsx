@@ -18,13 +18,18 @@ const TITLE = "El Reporte Energético";
  * rampa a cada lado, así que entre uno y otro hay un respiro en blanco: eso es
  * lo que hace que la atención caiga sobre una sola frase a la vez.
  */
-const BEATS = [0, 0.36, 0.84] as const;
+const BEATS = [0, 0.3, 0.68] as const;
 
-/** desde/hasta de cada texto. El último no se apaga: se queda con el formulario. */
+/**
+ * desde/hasta de cada texto. El último no se apaga y además entra pronto (0.68)
+ * dejando ~un tercio del riel de permanencia: la pantalla del formulario se
+ * sostiene mientras la persona sigue bajando, y en ese tramo el CTA se llena
+ * de color en vez de quedarse esperando.
+ */
 const VENTANAS = [
-  { desde: -0.1, hasta: 0.28 },
-  { desde: 0.36, hasta: 0.74 },
-  { desde: 0.84, hasta: 99 },
+  { desde: -0.1, hasta: 0.22 },
+  { desde: 0.3, hasta: 0.6 },
+  { desde: 0.68, hasta: 99 },
 ];
 
 function ventana(i: number): CSSProperties {
@@ -80,7 +85,7 @@ export default function EnergyReportSection() {
             base se limita al viewport, así que el mandala nunca se recorta. */}
         <div
           aria-hidden="true"
-          className="report-arte col-start-1 row-start-1 place-self-center"
+          className="report-arte pointer-events-none col-start-1 row-start-1 place-self-center"
         >
           <EnergyReveal className="h-full w-full" />
         </div>
@@ -108,11 +113,12 @@ export default function EnergyReportSection() {
         <div
           style={ventana(2)}
           inert={!ctaActivo}
-          className={`report-beat col-start-1 row-start-1 w-full max-w-xl place-self-center px-6 text-center ${
-            ctaActivo ? "pointer-events-auto" : ""
-          }`}
+          data-activo={ctaActivo || undefined}
+          className="report-beat col-start-1 row-start-1 w-full max-w-xl place-self-center px-6 text-center"
         >
-          <p className="text-base text-on-surface-variant sm:text-xl">
+          {/* Mismo tratamiento que el titular anterior: es el tercer tiempo de
+              la misma frase, no una nota al pie. */}
+          <p className="font-display text-2xl font-medium leading-tight text-on-surface sm:text-4xl">
             ¿Has verificado alguna vez qué energía habita en tu casa?
           </p>
           <form
@@ -138,7 +144,12 @@ export default function EnergyReportSection() {
               className="mt-3 w-full border-b border-outline bg-transparent pb-2 text-center font-display text-3xl text-on-surface placeholder:text-outline focus:border-secondary focus:outline-none sm:text-5xl"
             />
             <div className="mt-10">
-              <CtaButton type="submit" variant="secondary" size="lg">
+              <CtaButton
+                type="submit"
+                variant="secondary"
+                size="lg"
+                className="report-cta"
+              >
                 Conocer mi energía
               </CtaButton>
             </div>

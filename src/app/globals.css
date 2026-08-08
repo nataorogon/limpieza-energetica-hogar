@@ -98,6 +98,9 @@
      oro = logo + linework ceremonial · cta = botón primario Luz Suave */
   --gradient-gold: linear-gradient(135deg, #a9762f 0%, #d4a94a 100%);
   --gradient-cta: linear-gradient(135deg, #e9c9a6 0%, #b5766b 100%);
+  /* Fallback del progreso de scroll: el riel del Reporte lo sobrescribe por
+     rAF y el mandala lo hereda. Aquí, para cualquier otro uso, vale 0. */
+  --progress: 0;
 }
 
 @utility gradient-gold {
@@ -137,9 +140,8 @@ section[id] {
    machine de EnergyReportSection. Todo lo visual se resuelve aquí.
    ══════════════════════════════════════════════════════════════════ */
 
-.energy-flow {
-  --progress: 0;
-}
+/* Ojo: .energy-flow NO declara --progress. Si lo hiciera, cortaría la herencia
+   y el mandala dejaría de responder al riel de scroll que lo contiene. */
 
 /* Capa fantasma: el mandala completo, apenas insinuado (estado "incompleto") */
 .energy-flow .fol-ghost {
@@ -205,14 +207,64 @@ section[id] {
   animation-delay: var(--delay, 0s);
 }
 
-/* Transición de contenido: el intro se despide al activar y vuelve al cerrar */
-.report-intro {
-  transition: opacity 0.5s ease, transform 0.5s ease;
+/* ══════════════════════════════════════════════════════════════════
+   Riel de scroll del Reporte Energético
+   El riel mide ~4 viewports; dentro, un panel pegado arriba ocupa la
+   pantalla completa con TODAS las capas apiladas en la misma celda de
+   grid. Al bajar, --progress (0..1) crece y con él: el mandala escala
+   y cada texto entra y sale por su propia ventana. Resultado: la
+   página queda ocupada solo por el reporte y la atención cae sobre
+   una sola frase a la vez.
+   ══════════════════════════════════════════════════════════════════ */
+
+.report-riel {
+  min-height: 260svh;
 }
-[data-state="activating"] .report-intro,
-[data-state="form"] .report-intro {
-  opacity: 0;
-  transform: translateY(-8px);
+@media (min-width: 1024px) {
+  .report-riel {
+    min-height: 400svh;
+  }
+}
+
+.report-pin {
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* El mandala crece con el scroll — y SIEMPRE completo: el lado base está
+   limitado al viewport y la escala nunca pasa de 1, así que no se recorta. */
+.report-arte {
+  --lado: min(84vw, 72dvh);
+  width: var(--lado);
+  height: var(--lado);
+  /* Se apaga sobre el final: para cuando entra el formulario el mandala ya
+     está dibujado y denso, y compite con el texto justo cuando más importa
+     leerlo. Es el equivalente a que en la referencia la acuarela ya salió. */
+  opacity: calc(
+    0.85 - 0.52 * clamp(0, calc((var(--progress) - 0.66) / 0.2), 1)
+  );
+  transform: scale(calc(0.4 + 0.6 * var(--progress)))
+    rotate(calc(var(--progress) * 20deg));
+  will-change: transform;
+}
+
+/* Cada texto entra y sale por su ventana [--desde, --hasta], con una rampa a
+   cada lado. El min() de las dos rampas es lo que produce el cruce. */
+/* Los beats se apilan en la misma celda, así que el invisible de arriba taparía
+   los clics del de abajo: por defecto ninguno los recibe y React se los
+   devuelve (pointer-events-auto + inert) solo al que manda. */
+.report-beat {
+  --rampa: 0.09;
+  opacity: min(
+    clamp(0, calc((var(--progress) - var(--desde)) / var(--rampa)), 1),
+    clamp(0, calc((var(--hasta) - var(--progress)) / var(--rampa)), 1)
+  );
   pointer-events: none;
 }
 
@@ -279,11 +331,13 @@ section[id] {
   }
 }
 
+/* Entrada larga y muy suave (expo-out): la ceremonia es parte del producto,
+   no una transición de sistema. */
 .report-takeover[open] {
-  animation: takeover-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: takeover-in 950ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .report-takeover[open]::backdrop {
-  animation: backdrop-in 520ms ease both;
+  animation: backdrop-in 950ms ease both;
 }
 /* Salida: dialog.close() es inmediato, así que la orquesta el componente
    (data-closing → animationend → close). Keyframes con NOMBRE PROPIO, no
@@ -291,10 +345,10 @@ section[id] {
    salta al estado final sin disparar animationend y el modal se queda
    abierto e invisible. */
 .report-takeover[open][data-closing] {
-  animation: takeover-out 360ms cubic-bezier(0.55, 0, 1, 0.45) both;
+  animation: takeover-out 560ms cubic-bezier(0.7, 0, 0.84, 0) both;
 }
 .report-takeover[open][data-closing]::backdrop {
-  animation: backdrop-out 360ms ease both;
+  animation: backdrop-out 560ms ease both;
 }
 
 /* El mandala de fondo va completo: aquí no hay scroll que lo dibuje */
@@ -321,7 +375,9 @@ section[id] {
 }
 .report-track {
   transform: translateY(calc(var(--step, 0) * -100dvh));
-  transition: transform 700ms cubic-bezier(0.65, 0, 0.35, 1);
+  /* Lento y suave a propósito: el salto entre preguntas se tiene que leer
+     como un desplazamiento, no como un corte. */
+  transition: transform 950ms cubic-bezier(0.33, 0.05, 0.2, 1);
   will-change: transform;
 }
 .report-panel {
@@ -329,12 +385,21 @@ section[id] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* justify-content:center recortaría por arriba en cuanto el contenido no
+     quepa (el panel de cierre es alto y hay portátiles de 650px). Con
+     flex-start + margin-block:auto en el hijo se centra cuando sobra espacio
+     y se desplaza cuando falta, sin perder nada. */
+  justify-content: flex-start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 5.5rem 1.5rem 3rem;
   /* La pregunta saliente sigue montada mientras se va: se apaga en vuelo,
      que es lo que hace que se lea como una superficie continua. */
   opacity: 0;
-  transition: opacity 360ms ease 140ms;
+  transition: opacity 520ms ease 200ms;
+}
+.report-panel > * {
+  margin-block: auto;
 }
 .report-panel[data-active] {
   opacity: 1;
@@ -346,13 +411,41 @@ section[id] {
   }
   .energy-flow,
   .energy-flow *,
-  .report-intro,
   .report-takeover,
   .report-takeover::backdrop,
   .report-track,
-  .report-panel {
+  .report-panel,
+  .report-arte {
     animation: none !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* El riel se aplana: sin pin, sin apilado y con los tres textos visibles en
+     orden normal. Nadie se queda sin el contenido por no poder ver el efecto. */
+  .report-riel {
+    min-height: 0;
+  }
+  .report-pin {
+    position: static;
+    display: block;
+    height: auto;
+    padding-block: 4rem;
+  }
+  .report-pin > * {
+    margin-inline: auto;
+    margin-block: 2rem;
+  }
+  .report-beat {
+    opacity: 1 !important;
+    pointer-events: auto;
+  }
+  .report-arte {
+    transform: none;
+    opacity: 0.5;
+  }
+  /* Fuera del apilado el scrim no tiene nada que aclarar y solo empujaría */
+  .report-scrim {
+    display: none;
   }
   /* Contenido nunca oculto tras la animación: mandala completo, motas visibles */
   .energy-flow {

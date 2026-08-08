@@ -3,65 +3,84 @@
 import { useEffect, type RefObject } from "react";
 
 /**
- * Escribe --progress (0..1) como CSS custom property sobre el elemento,
- * ligado a su posición de scroll: 0 cuando su borde superior entra al
- * viewport, 1 cuando la sección está centrada. Toda la respuesta visual
- * es CSS puro leyendo esa variable — React nunca re-renderiza por scroll.
+ * Progreso de un riel de scroll con panel pegado (sticky).
  *
- * IntersectionObserver activa/desactiva el listener de scroll para que
- * fuera de vista no se haga ningún trabajo. Con enabled=false (reduced
- * motion) fija --progress: 1 — el contenido nunca queda oculto tras la
- * animación.
+ * El riel mide varias alturas de viewport; dentro va un panel `sticky top-0` de
+ * 100dvh con todas las capas apiladas en la misma celda. Este hook escribe
+ * --progress (0..1) sobre el riel en cada frame: todo lo visual —opacidad de
+ * cada texto, escala del mandala— lo resuelve el CSS leyendo esa variable, así
+ * que React NUNCA re-renderiza por scroll.
+ *
+ * Lo único que sube a estado es el índice del beat activo, vía `onBeat`, y solo
+ * cuando cambia: son 3 renders en todo el recorrido. Con eso el componente
+ * puede marcar `inert` la capa que no manda de forma declarativa — sin eso, el
+ * teclado cae en un campo invisible y, como el panel es sticky, enfocarlo ni
+ * siquiera lo trae a la vista: el foco simplemente desaparece.
  */
 export function useScrollProgress(
   ref: RefObject<HTMLElement | null>,
+  beats: readonly number[],
+  onBeat: (indice: number) => void,
   enabled: boolean = true,
 ) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
+    const aplicar = (p: number) => {
+      el.style.setProperty("--progress", p.toFixed(4));
+      let beat = 0;
+      for (let i = 0; i < beats.length; i++) if (p >= beats[i]) beat = i;
+      onBeat(beat);
+    };
+
     if (!enabled) {
-      el.style.setProperty("--progress", "1");
+      // Sin movimiento el riel no aplica: el CSS lo aplana y se ve todo.
+      aplicar(1);
       return;
     }
 
     let raf = 0;
-    let listening = false;
+    let escuchando = false;
 
-    const update = () => {
+    const medir = () => {
       raf = 0;
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const p = Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.9)));
-      el.style.setProperty("--progress", p.toFixed(4));
+      const recorrido = el.offsetHeight - window.innerHeight;
+      const p =
+        recorrido <= 0
+          ? 1
+          : Math.min(
+              1,
+              Math.max(0, -el.getBoundingClientRect().top / recorrido),
+            );
+      aplicar(p);
     };
 
     const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
+      if (!raf) raf = requestAnimationFrame(medir);
     };
 
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !listening) {
-          listening = true;
-          window.addEventListener("scroll", onScroll, { passive: true });
-          onScroll();
-        } else if (!entry.isIntersecting && listening) {
-          listening = false;
-          window.removeEventListener("scroll", onScroll);
-        }
-      },
-      { rootMargin: "25% 0px 25% 0px" },
-    );
+    const io = new IntersectionObserver(([entrada]) => {
+      if (entrada.isIntersecting && !escuchando) {
+        escuchando = true;
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll, { passive: true });
+        onScroll();
+      } else if (!entrada.isIntersecting && escuchando) {
+        escuchando = false;
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onScroll);
+      }
+    });
 
     io.observe(el);
-    update();
+    medir();
 
     return () => {
       io.disconnect();
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [ref, enabled]);
+  }, [ref, beats, onBeat, enabled]);
 }

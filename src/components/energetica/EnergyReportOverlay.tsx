@@ -98,14 +98,15 @@ export default function EnergyReportOverlay({
         finishClose();
       }}
     >
-      {/* Capa de arte: el mandala a sangre, el equivalente de marca a la
-          acuarela de la referencia. El scrim radial mantiene legible el
-          centro, que es donde vive la pregunta. */}
+      {/* Capa de arte. A diferencia de la referencia —que hace zoom a través de
+          la acuarela y la deja cortada por los cuatro lados— aquí el mandala se
+          ve COMPLETO: el lado se limita al viewport, así que el círculo exterior
+          siempre cierra. El scrim radial mantiene legible el centro. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 grid place-items-center opacity-50"
+        className="pointer-events-none absolute inset-0 grid place-items-center opacity-45"
       >
-        <EnergyReveal className="h-[120vmax] w-[120vmax]" />
+        <EnergyReveal className="h-[min(92vw,84dvh)] w-[min(92vw,84dvh)]" />
       </div>
       <div aria-hidden="true" className="report-scrim absolute inset-0" />
 

@@ -16,81 +16,35 @@ import {
 } from "@/lib/validation";
 
 type Campo = "nombre" | "ciudad" | "email" | "whatsapp";
-
-const CAMPOS: Campo[] = ["nombre", "ciudad", "email", "whatsapp"];
-
-const VALIDATORS: Record<Campo, (v: string) => boolean> = {
-  nombre: isValidNombre,
-  ciudad: isValidCiudad,
-  email: isValidEmail,
-  whatsapp: isValidWhatsapp,
-};
-
-const LABELS: Record<Campo, string> = {
-  nombre: "Yo soy",
-  ciudad: "Yo vivo en",
-  email: "Enviar mi reporte a",
-  whatsapp: "Enviarme mensajes de conciencia y energéticos a mi WhatsApp",
-};
-
-const PLACEHOLDERS: Record<Campo, string> = {
-  nombre: "Tu Nombre",
-  ciudad: "Tu Ciudad",
-  email: "correo",
-  whatsapp: "número de WhatsApp",
-};
-
-/**
- * Escala tipográfica por campo. "nombre"/"ciudad" son la respuesta-titular a
- * pantalla completa; "email" baja porque una dirección larga no cabe a 7xl, y
- * "whatsapp" va degradado (es opcional, y su placeholder es el más largo).
- */
-const INPUT_SIZES: Record<Campo, string> = {
-  nombre: "text-4xl uppercase sm:text-6xl lg:text-7xl",
-  ciudad: "text-4xl uppercase sm:text-6xl lg:text-7xl",
-  email: "text-2xl sm:text-4xl lg:text-5xl",
-  whatsapp: "text-xl sm:text-2xl",
-};
-
-const INPUT_TYPES: Record<Campo, string> = {
-  nombre: "text",
-  ciudad: "text",
-  email: "email",
-  whatsapp: "tel",
-};
-
-const AUTOCOMPLETE: Record<Campo, string> = {
-  nombre: "given-name",
-  ciudad: "address-level2",
-  email: "email",
-  whatsapp: "tel",
-};
-
-/**
- * El recorrido completo: primero el diagnóstico, después los datos.
- * Ese orden importa — pedir el correo antes de haber entregado nada convierte
- * peor, y las 7 preguntas son justamente lo que da valor al reporte.
- */
-type Paso =
-  | { kind: "modulo"; modulo: Modulo }
-  | { kind: "campo"; campo: Campo };
-
-const PASOS: Paso[] = [
-  ...MODULOS.map((modulo): Paso => ({ kind: "modulo", modulo })),
-  ...CAMPOS.map((campo): Paso => ({ kind: "campo", campo })),
-];
-
-const CIUDAD_IDX = PASOS.findIndex(
-  (p) => p.kind === "campo" && p.campo === "ciudad",
-);
-
 type Valores = Record<Campo, string>;
 
+/**
+ * Las tres líneas del cierre. Se acumulan en pantalla como una frase que la
+ * persona va completando —igual que la referencia— en vez de reemplazarse.
+ * La última junta correo y WhatsApp en UNA sola pantalla: son el mismo gesto
+ * ("cómo te lo mando"), y separarlos añadía un paso que nadie quiere dar.
+ */
+const LINEAS = [
+  { campo: "nombre" as const, label: "Yo soy", placeholder: "Tu Nombre" },
+  { campo: "ciudad" as const, label: "Yo vivo en", placeholder: "Tu Ciudad" },
+  {
+    campo: "email" as const,
+    label: "Enviar mi reporte a",
+    placeholder: "tu correo",
+  },
+];
+
+const N_MODULOS = MODULOS.length;
+const TOTAL_PASOS = N_MODULOS + LINEAS.length;
+/** El panel de contacto es uno solo: acumula, no se desplaza. */
+const PANEL_CONTACTO = N_MODULOS;
+const PANEL_ENVIANDO = N_MODULOS + 1;
+const CIUDAD_PASO = N_MODULOS + 1;
+
 type FormState = {
-  indice: number;
+  paso: number;
   valores: Valores;
   respuestas: Respuestas;
-  /** Tras el envío: la navegación al reporte está en curso. */
   enviando: boolean;
 };
 
@@ -102,11 +56,18 @@ type Action =
   | { type: "PREV" }
   | { type: "ENVIAR" };
 
-/** Un paso de módulo siempre es válido: no marcar nada es una respuesta. */
-function pasoValido(state: FormState, indice: number): boolean {
-  const paso = PASOS[indice];
-  if (paso.kind === "modulo") return true;
-  return VALIDATORS[paso.campo](state.valores[paso.campo]);
+/**
+ * Un paso de módulo siempre es válido: no marcar nada es una respuesta.
+ * El del correo exige correo válido y, si escribió WhatsApp, que tenga forma
+ * de teléfono — el campo es opcional, pero un número a medias no pasa.
+ */
+function pasoValido(state: FormState, paso: number): boolean {
+  if (paso < N_MODULOS) return true;
+  const { campo } = LINEAS[paso - N_MODULOS];
+  const { valores } = state;
+  if (campo === "nombre") return isValidNombre(valores.nombre);
+  if (campo === "ciudad") return isValidCiudad(valores.ciudad);
+  return isValidEmail(valores.email) && isValidWhatsapp(valores.whatsapp);
 }
 
 function reducer(state: FormState, action: Action): FormState {
@@ -122,7 +83,7 @@ function reducer(state: FormState, action: Action): FormState {
       // El input inline de la sección siembra "ciudad" cada vez que se abre el
       // takeover, pero solo mientras no se haya pasado de ese paso: después
       // manda lo que la persona escribió aquí dentro.
-      if (state.indice > CIUDAD_IDX || state.valores.ciudad === action.valor) {
+      if (state.paso > CIUDAD_PASO || state.valores.ciudad === action.valor) {
         return state;
       }
       return { ...state, valores: { ...state.valores, ciudad: action.valor } };
@@ -136,15 +97,15 @@ function reducer(state: FormState, action: Action): FormState {
       };
     case "NEXT":
       // El botón deshabilitado es UX; este guard es el invariante.
-      if (!pasoValido(state, state.indice)) return state;
-      if (state.indice >= PASOS.length - 1) return state;
-      return { ...state, indice: state.indice + 1 };
+      if (!pasoValido(state, state.paso)) return state;
+      if (state.paso >= TOTAL_PASOS - 1) return state;
+      return { ...state, paso: state.paso + 1 };
     case "PREV":
-      if (state.indice === 0) return state;
-      return { ...state, indice: state.indice - 1 };
+      if (state.paso === 0) return state;
+      return { ...state, paso: state.paso - 1 };
     case "ENVIAR":
-      if (state.indice !== PASOS.length - 1) return state;
-      if (!pasoValido(state, state.indice)) return state;
+      if (state.paso !== TOTAL_PASOS - 1) return state;
+      if (!pasoValido(state, state.paso)) return state;
       return { ...state, enviando: true };
   }
 }
@@ -152,15 +113,15 @@ function reducer(state: FormState, action: Action): FormState {
 /**
  * Micro-form del Reporte Energético dentro del takeover.
  *
- * Cada pregunta es un panel de 100dvh apilado en .report-track; avanzar solo
- * cambia --step y el CSS traslada el track -100dvh. No es scroll real: no hay
- * listeners, no pelea con el teclado virtual ni con scroll-snap, y la pregunta
- * saliente sigue montada mientras se va (por eso se lee como una superficie
- * continua y no como un carrusel). Los paneles inactivos van `inert`: fuera del
- * orden de tabulación y del árbol de accesibilidad.
+ * El track apila 7 paneles de diagnóstico (uno por capa) + 1 panel de cierre
+ * que acumula nombre, ciudad y contacto + 1 de envío. Avanzar solo cambia
+ * --step y el CSS traslada el track -100dvh: no es scroll real, así que no hay
+ * listeners, no pelea con el teclado virtual y el panel saliente sigue montado
+ * mientras se va. Los inactivos van `inert`, fuera del tabulado y del árbol de
+ * accesibilidad.
  *
- * Al enviar navega a /reporte con todo el resultado en el query string, que es
- * lo que hace el reporte compartible con el resto del hogar.
+ * Al enviar navega directo a /reporte —sin pantalla intermedia ni botón extra—
+ * con todo el resultado en el query string, que es lo que lo hace compartible.
  */
 export default function EnergyReportForm({
   initialCiudad,
@@ -171,15 +132,15 @@ export default function EnergyReportForm({
 }) {
   const router = useRouter();
   const [state, dispatch] = useReducer(reducer, {
-    indice: 0,
+    paso: 0,
     valores: { nombre: "", ciudad: initialCiudad, email: "", whatsapp: "" },
     respuestas: { ...RESPUESTAS_VACIAS },
     enviando: false,
   });
 
-  /** El control principal de cada panel, para devolverle el foco al avanzar. */
+  /** El control principal de cada paso, para devolverle el foco al avanzar. */
   const controles = useRef<Record<number, HTMLElement | null>>({});
-  const { indice, enviando } = state;
+  const { paso, enviando } = state;
 
   useEffect(() => {
     dispatch({ type: "SEED_CIUDAD", valor: initialCiudad });
@@ -189,13 +150,14 @@ export default function EnergyReportForm({
     if (enviando) return;
     // preventScroll: el panel entra por transform; dejar que el navegador
     // "acerque" el control le mete scrollTop al viewport y lo descuadra.
-    controles.current[indice]?.focus({ preventScroll: true });
-  }, [indice, enviando]);
+    controles.current[paso]?.focus({ preventScroll: true });
+  }, [paso, enviando]);
 
-  const esUltimo = indice === PASOS.length - 1;
-  const valido = pasoValido(state, indice);
-  /** El panel de "preparando" vive al final del track. */
-  const panelActivo = enviando ? PASOS.length : indice;
+  const esUltimo = paso === TOTAL_PASOS - 1;
+  const valido = pasoValido(state, paso);
+  const panelActivo = enviando
+    ? PANEL_ENVIANDO
+    : Math.min(paso, PANEL_CONTACTO);
 
   const enviar = () => {
     if (!valido) return;
@@ -211,6 +173,23 @@ export default function EnergyReportForm({
     );
   };
 
+  const pie = (
+    <div className="mt-9 flex items-center justify-center gap-5 text-xs text-on-surface-variant">
+      {paso > 0 && !enviando && (
+        <button
+          type="button"
+          onClick={() => dispatch({ type: "PREV" })}
+          className="min-h-11 rounded-full px-3 transition-colors hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+        >
+          ← Anterior
+        </button>
+      )}
+      <span className="ceremonial-label">
+        {Math.min(paso + 1, TOTAL_PASOS)} / {TOTAL_PASOS}
+      </span>
+    </div>
+  );
+
   return (
     <form
       className="report-viewport"
@@ -224,78 +203,183 @@ export default function EnergyReportForm({
         className="report-track"
         style={{ "--step": panelActivo } as CSSProperties}
       >
-        {PASOS.map((paso, i) => {
+        {MODULOS.map((modulo, i) => {
           const activo = i === panelActivo;
-          const ultimo = i === PASOS.length - 1;
           return (
             <section
-              key={paso.kind === "modulo" ? paso.modulo.id : paso.campo}
+              key={modulo.id}
               className="report-panel"
               data-active={activo || undefined}
               inert={!activo}
-              aria-label={
-                paso.kind === "modulo" ? paso.modulo.tema : LABELS[paso.campo]
-              }
+              aria-label={modulo.tema}
             >
               <div className="w-full max-w-2xl text-center">
-                {paso.kind === "modulo" ? (
-                  <PanelModulo
-                    modulo={paso.modulo}
-                    mascara={state.respuestas[paso.modulo.id]}
-                    activo={activo}
-                    onToggle={(bit) =>
-                      dispatch({
-                        type: "TOGGLE_SENAL",
-                        modulo: paso.modulo.id,
-                        bit,
-                      })
-                    }
-                    registrar={(el) => {
-                      controles.current[i] = el;
-                    }}
-                  />
-                ) : (
-                  <PanelCampo
-                    campo={paso.campo}
-                    valor={state.valores[paso.campo]}
-                    activo={activo}
-                    onChange={(valor) =>
-                      dispatch({ type: "SET_CAMPO", campo: paso.campo, valor })
-                    }
-                    registrar={(el) => {
-                      controles.current[i] = el;
-                    }}
-                  />
-                )}
+                <p className="ceremonial-label text-sm font-semibold text-secondary sm:text-base">
+                  {modulo.tema}
+                </p>
+                <h2 className="mt-4 font-display text-2xl font-medium text-on-surface sm:text-4xl">
+                  {modulo.pregunta}
+                </h2>
 
-                <div className="mt-10">
-                  <button
-                    type="submit"
-                    disabled={!pasoValido(state, i)}
-                    className="min-h-11 rounded-full bg-on-surface px-10 py-3 text-sm font-semibold tracking-wide text-surface transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary disabled:cursor-not-allowed disabled:opacity-35"
-                  >
-                    {ultimo ? "Ver mi reporte" : "Siguiente"}
-                  </button>
+                <div className="mt-8 space-y-3 text-left">
+                  {modulo.senales.map((senal, bit) => {
+                    const marcada = Boolean(
+                      (state.respuestas[modulo.id] >> bit) & 1,
+                    );
+                    return (
+                      <label
+                        key={senal.id}
+                        className={`flex cursor-pointer items-start gap-4 rounded-2xl border px-5 py-4 transition-colors ${
+                          marcada
+                            ? "border-secondary bg-secondary-container/60"
+                            : "border-outline-variant hover:border-outline"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          ref={
+                            bit === 0
+                              ? (el) => {
+                                  controles.current[i] = el;
+                                }
+                              : undefined
+                          }
+                          data-autofocus={(activo && bit === 0) || undefined}
+                          checked={marcada}
+                          onChange={() =>
+                            dispatch({
+                              type: "TOGGLE_SENAL",
+                              modulo: modulo.id,
+                              bit,
+                            })
+                          }
+                          className="mt-1 h-5 w-5 shrink-0 accent-secondary"
+                        />
+                        <span className="text-base leading-relaxed text-on-surface sm:text-lg">
+                          {senal.texto}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
 
-                <div className="mt-7 flex items-center justify-center gap-5 text-xs text-on-surface-variant">
-                  {i > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => dispatch({ type: "PREV" })}
-                      className="min-h-11 rounded-full px-3 transition-colors hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
-                    >
-                      ← Anterior
-                    </button>
-                  )}
-                  <span className="ceremonial-label">
-                    {i + 1} / {PASOS.length}
-                  </span>
-                </div>
+                <p className="mt-5 text-xs text-on-surface-variant">
+                  Marca las que reconozcas. Si ninguna te resuena, continúa sin
+                  marcar.
+                </p>
+
+                <BotonSiguiente habilitado ultimo={false} />
+                {pie}
               </div>
             </section>
           );
         })}
+
+        {/* Cierre: una sola pantalla que va sumando líneas. */}
+        <section
+          className="report-panel"
+          data-active={panelActivo === PANEL_CONTACTO || undefined}
+          inert={panelActivo !== PANEL_CONTACTO}
+          aria-label="Tus datos"
+        >
+          <div className="w-full max-w-2xl text-center">
+            <ol className="space-y-6">
+              {LINEAS.map((linea, i) => {
+                const pasoLinea = N_MODULOS + i;
+                if (pasoLinea > paso) return null;
+                const activa = pasoLinea === paso;
+                const esEmail = linea.campo === "email";
+                return (
+                  <li key={linea.campo}>
+                    <p className="ceremonial-label text-sm font-semibold text-secondary sm:text-base">
+                      {linea.label}
+                    </p>
+                    {activa ? (
+                      <input
+                        ref={(el) => {
+                          controles.current[pasoLinea] = el;
+                        }}
+                        id={`campo-${linea.campo}`}
+                        type={esEmail ? "email" : "text"}
+                        autoComplete={
+                          linea.campo === "nombre"
+                            ? "given-name"
+                            : linea.campo === "ciudad"
+                              ? "address-level2"
+                              : "email"
+                        }
+                        aria-label={linea.label}
+                        data-autofocus
+                        value={state.valores[linea.campo]}
+                        onChange={(e) =>
+                          dispatch({
+                            type: "SET_CAMPO",
+                            campo: linea.campo,
+                            valor: e.target.value,
+                          })
+                        }
+                        placeholder={`[ ${linea.placeholder} ]`}
+                        className={`mt-2 w-full border-b border-outline bg-transparent pb-2 text-center font-display text-on-surface placeholder:text-outline focus:border-secondary focus:outline-none ${
+                          esEmail
+                            ? "text-xl sm:text-3xl"
+                            : "text-3xl uppercase sm:text-5xl"
+                        }`}
+                      />
+                    ) : (
+                      <p
+                        className={`mt-2 break-words font-display text-on-surface ${
+                          esEmail
+                            ? "text-xl sm:text-3xl"
+                            : "text-3xl uppercase sm:text-5xl"
+                        }`}
+                      >
+                        {state.valores[linea.campo].trim()}
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+
+            {/* WhatsApp: aparece JUNTO al correo, no como un paso aparte. */}
+            {paso === TOTAL_PASOS - 1 && (
+              <div className="mt-10">
+                <p className="ceremonial-label text-sm font-semibold text-on-surface">
+                  Enviarme mensajes de conciencia a mi WhatsApp
+                </p>
+                <p className="ceremonial-label mt-1 text-xs text-on-surface-variant">
+                  Opcional
+                </p>
+                <input
+                  id="campo-whatsapp"
+                  type="tel"
+                  autoComplete="tel"
+                  aria-label="Número de WhatsApp (opcional)"
+                  value={state.valores.whatsapp}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "SET_CAMPO",
+                      campo: "whatsapp",
+                      valor: e.target.value,
+                    })
+                  }
+                  placeholder="000 000 000"
+                  className="mx-auto mt-3 block w-full max-w-xs border-b border-outline-variant bg-transparent pb-2 text-center font-display text-xl text-on-surface placeholder:text-outline focus:border-secondary focus:outline-none sm:text-2xl"
+                />
+                <p className="mx-auto mt-5 max-w-md text-xs leading-relaxed text-on-surface-variant">
+                  {/* TODO: texto legal definitivo pendiente de Términos & Privacidad reales — no publicar este provisional */}
+                  Al dejar tu número aceptas recibir mensajes por WhatsApp. No es
+                  una condición de compra y puedes dejar de recibirlos cuando
+                  quieras. (Texto legal provisional — Términos &amp; Privacidad
+                  próximamente.)
+                </p>
+              </div>
+            )}
+
+            <BotonSiguiente habilitado={valido} ultimo={esUltimo} />
+            {pie}
+          </div>
+        </section>
 
         <section
           className="report-panel"
@@ -324,115 +408,22 @@ export default function EnergyReportForm({
   );
 }
 
-/** Un paso de diagnóstico: 3 señales, marcar las que resuenen (o ninguna). */
-function PanelModulo({
-  modulo,
-  mascara,
-  activo,
-  onToggle,
-  registrar,
+function BotonSiguiente({
+  habilitado,
+  ultimo,
 }: {
-  modulo: Modulo;
-  mascara: number;
-  activo: boolean;
-  onToggle: (bit: number) => void;
-  registrar: (el: HTMLElement | null) => void;
+  habilitado: boolean;
+  ultimo: boolean;
 }) {
   return (
-    <>
-      <p className="ceremonial-label text-sm font-semibold text-secondary sm:text-base">
-        {modulo.tema}
-      </p>
-      <h2 className="mt-4 font-display text-2xl font-medium text-on-surface sm:text-4xl">
-        {modulo.pregunta}
-      </h2>
-
-      <div className="mt-8 space-y-3 text-left">
-        {modulo.senales.map((senal, bit) => {
-          const marcada = Boolean((mascara >> bit) & 1);
-          return (
-            <label
-              key={senal.id}
-              className={`flex cursor-pointer items-start gap-4 rounded-2xl border px-5 py-4 transition-colors ${
-                marcada
-                  ? "border-secondary bg-secondary-container/60"
-                  : "border-outline-variant hover:border-outline"
-              }`}
-            >
-              <input
-                type="checkbox"
-                ref={bit === 0 ? registrar : undefined}
-                data-autofocus={(activo && bit === 0) || undefined}
-                checked={marcada}
-                onChange={() => onToggle(bit)}
-                className="mt-1 h-5 w-5 shrink-0 accent-secondary"
-              />
-              <span className="text-base leading-relaxed text-on-surface sm:text-lg">
-                {senal.texto}
-              </span>
-            </label>
-          );
-        })}
-      </div>
-
-      <p className="mt-5 text-xs text-on-surface-variant">
-        Marca las que reconozcas. Si ninguna te resuena, continúa sin marcar.
-      </p>
-    </>
-  );
-}
-
-/** Un paso de contacto: la respuesta-titular a pantalla completa. */
-function PanelCampo({
-  campo,
-  valor,
-  activo,
-  onChange,
-  registrar,
-}: {
-  campo: Campo;
-  valor: string;
-  activo: boolean;
-  onChange: (valor: string) => void;
-  registrar: (el: HTMLElement | null) => void;
-}) {
-  const opcional = campo === "whatsapp";
-  return (
-    <>
-      <label
-        htmlFor={`campo-${campo}`}
-        className={
-          opcional
-            ? "block text-sm text-on-surface-variant"
-            : "ceremonial-label block text-sm font-semibold text-secondary sm:text-base"
-        }
+    <div className="mt-10">
+      <button
+        type="submit"
+        disabled={!habilitado}
+        className="min-h-11 rounded-full bg-on-surface px-10 py-3 text-sm font-semibold tracking-wide text-surface transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary disabled:cursor-not-allowed disabled:opacity-35"
       >
-        {LABELS[campo]}
-        {opcional && (
-          <span className="ml-1 text-on-surface-variant">(opcional)</span>
-        )}
-      </label>
-
-      <input
-        ref={registrar}
-        id={`campo-${campo}`}
-        type={INPUT_TYPES[campo]}
-        autoComplete={AUTOCOMPLETE[campo]}
-        data-autofocus={activo || undefined}
-        value={valor}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={`[ ${PLACEHOLDERS[campo]} ]`}
-        className={`mt-5 w-full border-b border-outline bg-transparent pb-3 text-center font-display text-on-surface placeholder:text-outline focus:border-secondary focus:outline-none ${INPUT_SIZES[campo]}`}
-      />
-
-      {opcional && (
-        <p className="mt-5 text-xs leading-relaxed text-on-surface-variant">
-          {/* TODO: texto legal definitivo pendiente de Términos & Privacidad reales — no publicar este provisional */}
-          Al dejar tu número aceptas recibir mensajes por WhatsApp. No es una
-          condición de compra y puedes dejar de recibirlos cuando quieras.
-          (Texto legal provisional — Términos &amp; Privacidad próximamente.)
-        </p>
-      )}
-    </>
+        {ultimo ? "Ver mi reporte" : "Siguiente"}
+      </button>
+    </div>
   );
 }

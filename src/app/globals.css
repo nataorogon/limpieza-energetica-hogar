@@ -197,8 +197,38 @@ section[id] {
 .energy-flow .fol-draw .fol-g3 circle {
   stroke-dashoffset: clamp(0, calc(1 - (var(--progress) - 0.3) / 0.55), 1);
 }
-.energy-flow .fol-draw .fol-g4 circle {
-  stroke-dashoffset: clamp(0, calc(1 - (var(--progress) - 0.5) / 0.5), 1);
+/* ── Anillo exterior: el haz de luz ──
+   Antes eran dos círculos que no empezaban a dibujarse hasta la mitad del
+   riel. Ahora arrancan con el primer scroll, igual que el centro, y en vez de
+   trazarse se comportan como una carga circular: una pista tenue fija, y
+   encima un haz cuya longitud crece con --progress mientras gira. */
+.energy-flow .fol-draw .fol-pista {
+  stroke-dasharray: none;
+  opacity: 0.3;
+}
+.energy-flow .fol-draw .fol-haz circle {
+  /* Mínimo 0.05 para que en el arranque ya haya una chispa girando, no nada.
+     Completa en 0.48, cuando el mandala termina de crecer y entra el form. */
+  --carga: clamp(0.05, calc(var(--progress) / 0.48), 1);
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--carga));
+  stroke-linecap: round;
+}
+.energy-flow .fol-draw .fol-haz-halo {
+  stroke-width: 5;
+  opacity: 0.4;
+}
+.energy-flow .fol-draw .fol-haz-nucleo {
+  stroke-width: 1.6;
+}
+/* Rotación ESTÁTICA de -90°: mueve el origen del trazo de las 3 a las 12, así
+   la carga arranca arriba y avanza en sentido horario, como cualquier medidor.
+   Sin animación propia a propósito: el haz avanza SOLO con el scroll. Un giro
+   infinito se lee como "esperando", no como "cargando con lo que haces". */
+.energy-flow .fol-draw .fol-haz {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(-90deg);
 }
 
 /* Motas: aparecen escalonadas contra el progreso del scroll */
@@ -242,6 +272,11 @@ section[id] {
   stroke-dasharray: none;
   stroke-dashoffset: 0;
   animation: none;
+}
+/* Dentro del takeover el haz ya está completo (la regla de arriba le pone
+   dashoffset 0) y la pista sube a plena opacidad: anillo exterior cerrado. */
+[data-state="form"] .energy-flow .fol-draw .fol-pista {
+  opacity: 1;
 }
 
 [data-state="activating"] .energy-flow .mote,

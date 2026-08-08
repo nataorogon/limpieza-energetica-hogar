@@ -58,9 +58,37 @@ export default function FlowerOfLife({
         {RING_2A.map(([x, y], i) => circle(x, y, R, `r2a-${i}`))}
         {RING_2B.map(([x, y], i) => circle(x, y, R, `r2b-${i}`))}
       </g>
+      {/* Anillo exterior: ya no son dos círculos que se dibujan, sino una
+          pista tenue y un haz que la recorre. El haz avanza con --progress
+          —arranca arriba y va en sentido horario—, así que se lee como energía
+          cargándose en círculo al ritmo del scroll y no como dos trazos.
+          Fuera de .energy-flow los tres se pintan completos y concéntricos:
+          el mandala sigue viéndose entero como marca de agua. */}
       <g className="fol-g4">
-        {circle(CX, CY, 104, "outer-1")}
-        {circle(CX, CY, 109, "outer-2")}
+        <circle
+          cx={CX}
+          cy={CY}
+          r={106}
+          className="fol-pista"
+          pathLength={1}
+        />
+        <g className="fol-haz">
+          <circle
+            cx={CX}
+            cy={CY}
+            r={106}
+            className="fol-haz-halo"
+            pathLength={1}
+            filter="blur(2.5px)"
+          />
+          <circle
+            cx={CX}
+            cy={CY}
+            r={106}
+            className="fol-haz-nucleo"
+            pathLength={1}
+          />
+        </g>
       </g>
     </svg>
   );

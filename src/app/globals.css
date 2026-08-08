@@ -278,7 +278,10 @@ section[id] {
   display: grid;
   grid-template-rows: 1fr;
   grid-template-columns: 1fr;
-  height: 100dvh;
+  /* svh, NO dvh, y en la misma unidad que el riel. dvh crece cuando el móvil
+     esconde la barra de direcciones: el panel se estiraba de golpe a mitad del
+     scroll y su contenido centrado daba un salto. svh es la altura estable. */
+  height: 100svh;
   width: 100%;
   overflow: hidden;
   /* Vaciado del panel antes de que se despegue. Un panel pegado deja de estarlo
@@ -292,11 +295,12 @@ section[id] {
 
 /* El mandala crece con el scroll — y SIEMPRE completo: el lado base está
    limitado al viewport y la escala nunca pasa de 1, así que no se recorta.
-   Termina de crecer en 0.68 y de ahí en adelante se queda quieto: el último
-   tramo es para leer el formulario, no para seguir mirando cómo crece. */
+   Empieza a formarse con el primer scroll —junto con el primer texto— y
+   termina de crecer en 0.48, justo cuando entra el formulario. De ahí en
+   adelante se queda quieto: ese tramo es para leer, no para mirar cómo crece. */
 .report-arte {
-  --lado: min(84vw, 72dvh);
-  --crecimiento: clamp(0, calc(var(--progress) / 0.68), 1);
+  --lado: min(84vw, 72svh);
+  --crecimiento: clamp(0, calc(var(--progress) / 0.48), 1);
   width: var(--lado);
   height: var(--lado);
   opacity: calc((0.85 - 0.3 * var(--crecimiento)) * (1 - var(--salida, 0)));
@@ -323,10 +327,16 @@ section[id] {
    los clics del de abajo: por defecto ninguno los recibe y React se los
    devuelve (pointer-events-auto + inert) solo al que manda. */
 .report-beat {
-  --rampa: 0.08;
-  opacity: min(
-    clamp(0, calc((var(--progress) - var(--desde)) / var(--rampa)), 1),
-    clamp(0, calc((var(--hasta) - var(--progress)) / var(--rampa)), 1)
+  --rampa: 0.11;
+  --entra: clamp(0, calc((var(--progress) - var(--desde)) / var(--rampa)), 1);
+  --sale: clamp(0, calc((var(--hasta) - var(--progress)) / var(--rampa)), 1);
+  opacity: min(var(--entra), var(--sale));
+  /* Un desplazamiento corto acompaña el fundido: el que llega sube desde
+     abajo, el que se va sigue subiendo. Nunca coinciden en pantalla —el
+     relevo es exacto— así que esto no oculta un cruce, solo evita que los
+     textos parpadeen en seco. */
+  transform: translateY(
+    calc((1 - var(--entra)) * 18px + (1 - var(--sale)) * -18px)
   );
   /* Por encima del mandala y del scrim, siempre. */
   position: relative;
@@ -357,7 +367,8 @@ section[id] {
   z-index: -1;
   border-radius: inherit;
   background-image: var(--gradient-cta);
-  opacity: clamp(0, calc((var(--progress) - 0.72) / 0.16), 1);
+  /* Arranca justo después de que el formulario termina de entrar (0.59) */
+  opacity: clamp(0, calc((var(--progress) - 0.62) / 0.18), 1);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -532,6 +543,7 @@ section[id] {
   }
   .report-beat {
     opacity: 1 !important;
+    transform: none;
     pointer-events: auto;
   }
   .report-arte {

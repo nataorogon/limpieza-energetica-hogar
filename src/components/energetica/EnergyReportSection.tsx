@@ -18,18 +18,33 @@ const TITLE = "El Reporte Energético";
  * rampa a cada lado, así que entre uno y otro hay un respiro en blanco: eso es
  * lo que hace que la atención caiga sobre una sola frase a la vez.
  */
-const BEATS = [0, 0.3, 0.68] as const;
+/** El relevo: donde uno acaba de apagarse y el siguiente empieza a encenderse. */
+const BEATS = [0, 0.13, 0.48] as const;
 
 /**
- * desde/hasta de cada texto. El último no se apaga y además entra pronto (0.68)
- * dejando ~un tercio del riel de permanencia: la pantalla del formulario se
- * sostiene mientras la persona sigue bajando, y en ese tramo el CTA se llena
- * de color en vez de quedarse esperando.
+ * desde/hasta de cada texto. Tres reglas gobiernan estos números:
+ *
+ * 1. SIN ESPERA. El primero empieza a irse en 0.02 —el primer gesto de scroll—,
+ *    no después. Antes aguantaba quieto hasta 0.25, que en un riel de 480svh
+ *    son ~95svh: un viewport entero sin que pasara nada. Su `desde` es -0.11
+ *    (= -rampa) para que ya esté al 100% al llegar.
+ *
+ * 2. RELEVO EXACTO, SIN SUPERPOSICIÓN. El `desde` de cada uno es el `hasta` del
+ *    anterior (0.13 y 0.48). En ese punto ambos valen 0 —un instante, no un
+ *    tramo—, así que nunca se ven dos textos encimados y tampoco queda
+ *    pantalla vacía. Van apilados en la misma celda: si se cruzaran a media
+ *    opacidad serían una mancha ilegible.
+ *
+ * 3. TODOS ENTRAN DESVANECIDOS. Ninguno aparece de golpe; el que llega sube
+ *    desde abajo mientras se enciende.
+ *
+ * El último no se apaga: entra en 0.48 y deja ~40% del riel de permanencia
+ * para que el formulario se sostenga mientras se sigue bajando.
  */
 const VENTANAS = [
-  { desde: -0.1, hasta: 0.22 },
-  { desde: 0.3, hasta: 0.6 },
-  { desde: 0.68, hasta: 99 },
+  { desde: -0.11, hasta: 0.13 },
+  { desde: 0.13, hasta: 0.48 },
+  { desde: 0.48, hasta: 99 },
 ];
 
 function ventana(i: number): CSSProperties {

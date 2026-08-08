@@ -61,6 +61,10 @@
   /* ── Funcionales (en familia con la paleta cálida, no rojo/verde genérico) ── */
   --color-success: #7c9473;
   --color-on-success: #ffffff;
+  /* Ámbar del semáforo del Reporte: el naranja intermedio, tirado hacia el oro
+     de marca para que no se lea como una alerta de sistema operativo. */
+  --color-warning: #c08334;
+  --color-on-warning: #ffffff;
   --color-error: #a85c4a;
   --color-on-error: #ffffff;
 

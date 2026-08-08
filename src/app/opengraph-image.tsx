@@ -9,9 +9,9 @@ import { join } from "node:path";
  * (1080×1550) y al recortarla a 1200×630 se perdía la cara. Aquí se compone:
  * la promesa a la izquierda sobre el crema de marca, la foto a la derecha.
  *
- * Tipografía: la del sistema de satori. Las fuentes de marca (Fraunces,
- * Cormorant) solo llegan como .woff2 vía next/font y satori no lee woff2 —
- * necesitaría el .ttf en el repo. Ver nota al final del archivo.
+ * Las fuentes se leen de src/assets/fonts en .ttf estático: next/font solo
+ * deja .woff2 y el generador de imágenes no lo lee. Van versionadas —
+ * descargarlas en build desde Google romperia el deploy si falla la red.
  */
 export const alt =
   "Recupera la paz de tu hogar en 7 días — Limpieza Energética del Hogar con Nata Orogon";
@@ -26,9 +26,11 @@ const CAFE_SUAVE = "#5f473c";
 const ORO = "#a9762f";
 
 export default async function Image() {
-  const foto = await readFile(
-    join(process.cwd(), "public/images/mujer-tranquila.jpg"),
-  );
+  const [foto, fraunces, frauncesSemi] = await Promise.all([
+    readFile(join(process.cwd(), "public/images/mujer-tranquila.jpg")),
+    readFile(join(process.cwd(), "src/assets/fonts/Fraunces_72pt-Regular.ttf")),
+    readFile(join(process.cwd(), "src/assets/fonts/Fraunces_72pt-SemiBold.ttf")),
+  ]);
   const fotoSrc = `data:image/jpeg;base64,${foto.toString("base64")}`;
 
   return new ImageResponse(
@@ -39,6 +41,7 @@ export default async function Image() {
           height: "100%",
           display: "flex",
           backgroundColor: CREMA,
+          fontFamily: "Fraunces",
         }}
       >
         <div
@@ -68,6 +71,7 @@ export default async function Image() {
               display: "flex",
               flexWrap: "wrap",
               fontSize: 64,
+              fontWeight: 600,
               lineHeight: 1.12,
               color: CAFE,
             }}
@@ -108,11 +112,12 @@ export default async function Image() {
         </div>
       </div>
     ),
-    size,
+    {
+      ...size,
+      fonts: [
+        { name: "Fraunces", data: fraunces, weight: 400, style: "normal" },
+        { name: "Fraunces", data: frauncesSemi, weight: 600, style: "normal" },
+      ],
+    },
   );
 }
-
-/* TODO(marca): para que la tarjeta use Fraunces en vez de la fuente por
-   defecto, dejar `Fraunces.ttf` en el repo y pasarlo por la opción `fonts`
-   de ImageResponse. Descargarlo en build desde Google rompe el deploy si la
-   red falla, así que el .ttf tiene que estar versionado. */

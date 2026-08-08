@@ -95,12 +95,23 @@ export default function EnergyReportSection() {
           className="report-scrim col-start-1 row-start-1 h-full w-full"
         />
 
-        <p
+        {/* Primer tiempo: el puente. Antes aquí solo había un rótulo, y el
+            Reporte quedaba preguntando por un problema que nadie había
+            nombrado — "Tu casa habla", donde se explica la energía densa,
+            ahora va DESPUÉS. Esta frase nombra al enemigo y justifica medir,
+            sin agregar sección ni alargar el riel. El rótulo baja a eyebrow. */}
+        <div
           style={ventana(0)}
-          className="report-beat ceremonial-label col-start-1 row-start-1 place-self-center px-6 text-center text-2xl font-semibold text-secondary sm:text-4xl"
+          className="report-beat col-start-1 row-start-1 max-w-3xl place-self-center px-6 text-center"
         >
-          {TITLE}
-        </p>
+          <p className="ceremonial-label text-sm font-semibold text-secondary sm:text-base">
+            {TITLE}
+          </p>
+          <p className="mt-6 font-display text-3xl font-medium leading-tight text-on-surface sm:text-5xl lg:text-6xl">
+            Toda casa acumula lo que vivió.
+            <span className="block text-secondary">La tuya también.</span>
+          </p>
+        </div>
 
         <h2
           id={TITLE_ID}

@@ -25,10 +25,16 @@ const inter = Inter({
   display: "swap",
 });
 
+/**
+ * El snippet de Google y la vista previa al compartir el link son el titular
+ * fuera del sitio: repiten la misma promesa (B.C + V − P) que el hero, no una
+ * descripción genérica del producto. La description va en ~155 caracteres,
+ * que es donde Google corta.
+ */
 export const metadata: Metadata = {
-  title: "Limpieza Energética del Hogar — Nata Orogon",
+  title: "Limpieza Energética del Hogar en 7 Días — Nata Orogon",
   description:
-    "Programa guiado de 7 días con audio-activaciones de Lenguajes de Luz para liberar la energía densa de tu casa y volver a sentirla como tu refugio.",
+    "Recupera la paz de tu hogar en 7 días con un método basado en Registros Akáshicos y activado con Lenguajes de Luz. Sin rituales complicados, 15 min al día.",
 };
 
 export default function RootLayout({

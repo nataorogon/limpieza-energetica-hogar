@@ -13,17 +13,35 @@ export default function Hero() {
       <BotanicalAccent className="pointer-events-none absolute -right-6 top-8 h-40 w-auto opacity-50 sm:h-56" />
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-14 sm:px-6 md:grid-cols-2 md:gap-14 md:pb-24 md:pt-20">
         <div>
+          {/* La promesa dolorosa (B.C + V − P) en tres tiempos tipográficos.
+              Va en el lugar del titular, no debajo: los 2-3 segundos que dura
+              la atención se los lleva el H1, y antes se gastaban repitiendo
+              sin cuantificar lo que la promesa ya decía bien.
+              1) beneficio cuantificado — 2) vehículo único — 3) los "sin".
+              Tres tamaños, tres pesos, tres colores: cada tiempo se lee solo. */}
           <h1
             id="hero-titulo"
             className="font-display text-4xl font-medium leading-tight text-on-surface sm:text-5xl lg:text-6xl"
           >
-            La tranquilidad comienza limpiando la{" "}
-            <em className="not-italic text-secondary">energía de tu hogar</em>.
+            Recupera la paz de tu hogar en{" "}
+            <em className="not-italic text-secondary">7 días</em>.
           </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-on-surface-variant sm:text-lg">
-            Recupera la paz en tu hogar en 7 días con un metodo de limpieza basado en Registros Akashikos y activado
-            con Lenguajes de Luz. 
-            Libera la energía densa de tu casa y vuelve a sentirla como tu refugio, sin rituales complicados, sin experiencia previa y con solo 15 minutos al día.
+
+          {/* 24px mínimo: el dorado de marca da 3.66:1 sobre el fondo crema, que
+              cumple AA solo como texto grande (≥24px). A 20px incumpliría. */}
+          <p className="mt-6 max-w-lg font-display text-2xl leading-snug text-on-surface-variant lg:text-3xl">
+            con un método de limpieza basado en{" "}
+            <em className="not-italic text-secondary">Registros Akáshicos</em> y
+            activado con{" "}
+            <em className="not-italic text-secondary">Lenguajes de Luz</em>.
+          </p>
+
+          <div
+            aria-hidden="true"
+            className="gradient-gold mt-8 h-px w-16 opacity-70"
+          />
+          <p className="ceremonial-label mt-4 max-w-md text-xs font-semibold leading-relaxed text-on-surface-variant sm:text-sm">
+            Sin rituales complicados · Sin experiencia previa · 15 minutos al día
           </p>
           {/* Un solo CTA: el Reporte Energético es ahora la sección inmediata
               siguiente, así que un botón que baje hasta él solo compite. */}

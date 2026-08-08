@@ -31,10 +31,30 @@ const inter = Inter({
  * descripción genérica del producto. La description va en ~155 caracteres,
  * que es donde Google corta.
  */
+const TITULO = "Limpieza Energética del Hogar en 7 Días — Nata Orogon";
+const DESCRIPCION =
+  "Recupera la paz de tu hogar en 7 días con un método basado en Registros Akáshicos y activado con Lenguajes de Luz. Sin rituales complicados, 15 min al día.";
+
 export const metadata: Metadata = {
-  title: "Limpieza Energética del Hogar en 7 Días — Nata Orogon",
-  description:
-    "Recupera la paz de tu hogar en 7 días con un método basado en Registros Akáshicos y activado con Lenguajes de Luz. Sin rituales complicados, 15 min al día.",
+  // metadataBase convierte las rutas relativas (og:image, canonical) en URLs
+  // absolutas. Sin esto la vista previa al compartir se queda sin imagen.
+  metadataBase: new URL("https://limpieza-energetica-hogar.nataorogon.com"),
+  title: TITULO,
+  description: DESCRIPCION,
+  openGraph: {
+    title: TITULO,
+    description: DESCRIPCION,
+    url: "/",
+    siteName: "Nata Orogon",
+    locale: "es_CO",
+    type: "website",
+    // La imagen la aporta src/app/opengraph-image.tsx (1200×630 generada).
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITULO,
+    description: DESCRIPCION,
+  },
 };
 
 export default function RootLayout({

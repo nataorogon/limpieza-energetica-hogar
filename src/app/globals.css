@@ -91,6 +91,10 @@
   --color-on-surface-variant: var(--color-cafe-700);
   --color-outline: var(--color-cafe-400);
   --color-outline-variant: var(--color-cafe-300);
+  /* Velo sobre foto: el único contexto de la marca con fondo oscuro, para
+     que un texto encima de una imagen tenga contraste sin inventar colores. */
+  --color-scrim: var(--color-cafe-900);
+  --color-on-scrim: var(--color-cafe-50);
 }
 
 :root {
@@ -115,6 +119,30 @@
   font-family: var(--font-ceremonial);
   text-transform: uppercase;
   letter-spacing: 0.22em;
+}
+
+/* Armoniza una foto ajena con la paleta Luz Suave: baja el azul y el verde
+   hacia el crema/oro de marca sin lavar la imagen. Va en el CONTENEDOR de la
+   foto (necesita ser `relative` para el velo).
+   Usar solo cuando la foto NO viene ya en tonos cálidos — sobre una imagen
+   que ya está en paleta, el filtro la ensucia. */
+@utility foto-marca {
+  position: relative;
+  overflow: hidden;
+  /* sepia baja la dominante fría; saturate/contrast devuelven cuerpo */
+  filter: sepia(0.22) saturate(0.9) contrast(1.04) brightness(1.02);
+}
+/* Velo cálido en soft-light: tiñe las luces sin apagar las sombras */
+@utility foto-marca {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-color: var(--color-arena-300);
+    mix-blend-mode: soft-light;
+    opacity: 0.45;
+  }
 }
 
 html {

@@ -51,18 +51,33 @@ export default function Hero() {
             </CtaButton>
           </div>
         </div>
-        {/* width/height son las intrínsecas del archivo (1080×1550): fijan la
-            proporción y evitan el salto de layout mientras carga. `priority`
-            porque está sobre la línea de flotación y es el LCP del hero. */}
-        <Image
-          src="/images/mujer-tranquila.jpg"
-          alt="Una mujer descansa con los ojos cerrados en su sala luminosa, entre plantas y velas encendidas"
-          width={1080}
-          height={1550}
-          priority
-          sizes="(min-width: 768px) 28rem, 100vw"
-          className="w-full max-w-md justify-self-center rounded-lg md:justify-self-end"
-        />
+        {/* La foto lleva al pie la frase que antes era el titular. Sirve dos
+            cosas: reintroduce la palabra "energía" —que el Reporte de abajo
+            da por sabida— y le devuelve su lugar a una frase que como H1
+            competía con la promesa, pero como pie de imagen acompaña. */}
+        <figure className="relative w-full max-w-md justify-self-center overflow-hidden rounded-lg md:justify-self-end">
+          {/* width/height son las intrínsecas del archivo (1080×1550): fijan la
+              proporción y evitan el salto de layout mientras carga. `priority`
+              porque está sobre la línea de flotación y es el LCP del hero. */}
+          <Image
+            src="/images/mujer-tranquila.jpg"
+            alt="Una mujer descansa con los ojos cerrados en su sala luminosa, entre plantas y velas encendidas"
+            width={1080}
+            height={1550}
+            priority
+            sizes="(min-width: 768px) 28rem, 100vw"
+            className="w-full"
+          />
+          {/* Velo solo en el tercio inferior: la foto es clara y sin él la
+              frase se pierde sobre las velas. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-scrim/80 via-scrim/45 to-transparent"
+          />
+          <figcaption className="absolute inset-x-0 bottom-0 p-6 font-ceremonial text-xl leading-snug text-on-scrim sm:text-2xl">
+            La tranquilidad comienza limpiando la energía de tu hogar.
+          </figcaption>
+        </figure>
       </div>
     </section>
   );

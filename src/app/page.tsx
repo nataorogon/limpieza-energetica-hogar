@@ -13,13 +13,19 @@ import CtaFinal from "@/components/energetica/CtaFinal";
 import Faq from "@/components/energetica/Faq";
 import Postdata from "@/components/energetica/Postdata";
 
-/** Orden del funnel según contenido-landing-page.md (S1–S19). */
+/**
+ * Orden del funnel según contenido-landing-page.md (S1–S19), con una
+ * desviación deliberada: el Reporte Energético va ANTES de "Tu casa habla".
+ * El reporte es el gancho —diagnostica y captura— y llega mientras la persona
+ * todavía tiene atención; el problema se desarrolla después, ya con el
+ * resultado en la mano y con las 7 señales resonando.
+ */
 export default function Home() {
   return (
     <>
       <Hero />
-      <Problema />
       <EnergyReportSection />
+      <Problema />
       <Solucion />
       <LenguajesDeLuz />
       <Guia />

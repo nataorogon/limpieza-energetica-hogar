@@ -1,5 +1,5 @@
+import Image from "next/image";
 import CtaButton from "@/components/shared/CtaButton";
-import PhotoPlaceholder from "@/components/shared/PhotoPlaceholder";
 import BotanicalAccent from "@/components/shared/svg/BotanicalAccent";
 
 /** Sección 1 — Hero (above the fold). */
@@ -26,19 +26,25 @@ export default function Hero() {
             tu casa y volver a sentirla como tu refugio. Sin rituales
             complicados. Sin experiencia previa. Solo 15 minutos al día.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          {/* Un solo CTA: el Reporte Energético es ahora la sección inmediata
+              siguiente, así que un botón que baje hasta él solo compite. */}
+          <div className="mt-8">
             <CtaButton href="#oferta" variant="primary" size="lg">
               Comenzar mi limpieza de 7 días
             </CtaButton>
-            <CtaButton href="#reporte" variant="secondary" size="lg">
-              Recibir mi Reporte Energético gratis
-            </CtaButton>
           </div>
         </div>
-        <PhotoPlaceholder
-          label="Una mujer serena en su sala luminosa — el destino emocional"
-          aspect="4/5"
-          className="max-w-md justify-self-center md:justify-self-end"
+        {/* width/height son las intrínsecas del archivo (1080×1550): fijan la
+            proporción y evitan el salto de layout mientras carga. `priority`
+            porque está sobre la línea de flotación y es el LCP del hero. */}
+        <Image
+          src="/images/mujer-tranquila.jpg"
+          alt="Una mujer descansa con los ojos cerrados en su sala luminosa, entre plantas y velas encendidas"
+          width={1080}
+          height={1550}
+          priority
+          sizes="(min-width: 768px) 28rem, 100vw"
+          className="w-full max-w-md justify-self-center rounded-lg md:justify-self-end"
         />
       </div>
     </section>

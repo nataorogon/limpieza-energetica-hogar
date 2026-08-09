@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import SectionEyebrow from "@/components/shared/SectionEyebrow";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import EnergyReveal from "./energy-flow/EnergyReveal";
+import GoldParticles from "./energy-flow/GoldParticles";
 
 /**
  * Takeover a pantalla completa del Reporte Energético.
@@ -98,20 +98,18 @@ export default function EnergyReportOverlay({
         finishClose();
       }}
     >
-      {/* Capa de arte. A diferencia de la referencia —que hace zoom a través de
-          la acuarela y la deja cortada por los cuatro lados— aquí el mandala se
-          ve COMPLETO: el lado se limita al viewport, así que el círculo exterior
-          siempre cierra. El scrim radial mantiene legible el centro. */}
+      {/* Capa de arte: SOLO motas derivando. Ni flor ni haz — esos son el
+          medidor del riel, y aquí ya cumplieron. Detenidos detrás de 10
+          preguntas eran ruido: un dibujo grande que compite con la pregunta y
+          que, una vez completo, no comunica nada. Las motas sí: son movimiento
+          lento y sin meta, que es la sensación que queremos mientras se
+          responde. Van más opacas que antes (0.7) porque ahora no se apoyan en
+          el linework; el scrim radial sigue despejando el centro. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 grid place-items-center opacity-45"
+        className="pointer-events-none absolute inset-0 grid place-items-center opacity-70"
       >
-        {/* Con motas: aquí el mandala está quieto y ellas son lo único que
-            se mueve. En el riel de la landing no van. */}
-        <EnergyReveal
-          motas
-          className="h-[min(92vw,84dvh)] w-[min(92vw,84dvh)]"
-        />
+        <GoldParticles className="h-[min(92vw,84dvh)] w-[min(92vw,84dvh)]" />
       </div>
       <div aria-hidden="true" className="report-scrim absolute inset-0" />
 

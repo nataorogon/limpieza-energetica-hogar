@@ -248,13 +248,17 @@ section[id] {
   transform: rotate(-90deg);
 }
 
-/* Motas: aparecen escalonadas contra el progreso del scroll */
-.energy-flow .mote {
-  opacity: clamp(0, calc((var(--progress) - var(--stagger)) * 2.5), 1);
+/* ── Motas de luz ──
+   Independientes de .energy-flow: viven solo dentro del cuestionario, donde
+   son el fondo entero. No leen --progress ni data-state — derivan siempre,
+   en bucle y desfasadas entre sí, para que el fondo respire sin marcar ritmo
+   (un fondo que "avanza" mientras se responde se lee como cronómetro). */
+.motas-luz .mote {
+  opacity: 1;
+  animation: mote-drift var(--dur, 7s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
 }
 
-/* Fase activa (tras el CTA): el linework "respira" con un brillo que
-   recorre los trazos, y las motas derivan en bucles suaves */
 @keyframes mote-drift {
   0%,
   100% {
@@ -267,10 +271,10 @@ section[id] {
   }
 }
 
-/* Fases "activating" (los ~450ms del CTA) y "form" (dentro del cuestionario):
-   la flor se completa y se queda QUIETA. Nada de recorrer los trazos mientras
-   se contestan 10 preguntas — eso se lee como un cronómetro, no como calma.
-   Solo las motas siguen derivando. */
+/* Al pulsar el CTA ("activating", ~450ms, y luego "form"): la flor del riel se
+   completa de golpe y se queda QUIETA mientras el takeover entra por encima.
+   Si se quedara a medias, el último fotograma antes del corte sería un medidor
+   sin terminar. */
 [data-state="activating"] .energy-flow,
 [data-state="form"] .energy-flow {
   --carga: 1;
@@ -279,16 +283,6 @@ section[id] {
 [data-state="form"] .energy-flow .fol-draw {
   -webkit-mask-image: none;
   mask-image: none;
-}
-[data-state="form"] .energy-flow .fol-pista {
-  opacity: 1;
-}
-
-[data-state="activating"] .energy-flow .mote,
-[data-state="form"] .energy-flow .mote {
-  opacity: 1;
-  animation: mote-drift var(--dur, 7s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -494,15 +488,10 @@ section[id] {
   animation: backdrop-out 560ms ease both;
 }
 
-/* El mandala de fondo va completo: aquí no hay scroll que lo dibuje */
-.report-takeover .energy-flow {
-  --progress: 1;
-}
-
-/* Deja legible el centro del takeover, que es donde vive la pregunta */
-/* Suave a propósito: el texto ya se pinta por encima del mandala (z-index),
-   así que el scrim solo tiene que bajarle el contraste al linework detrás de
-   las letras — no borrarlo. Tapar el mandala entero era pasarse de largo. */
+/* Deja legible el centro del takeover, que es donde vive la pregunta.
+   Suave a propósito: el texto ya se pinta por encima del arte (z-index), así
+   que el scrim solo tiene que bajarle el contraste a lo que pase por detrás de
+   las letras — no borrarlo. */
 .report-scrim {
   pointer-events: none;
   background: radial-gradient(
@@ -557,6 +546,7 @@ section[id] {
   }
   .energy-flow,
   .energy-flow *,
+  .motas-luz .mote,
   .report-takeover,
   .report-takeover::backdrop,
   .report-track,
@@ -594,11 +584,8 @@ section[id] {
   .report-scrim {
     display: none;
   }
-  /* Contenido nunca oculto tras la animación: mandala completo, motas visibles */
+  /* Contenido nunca oculto tras la animación: la flor se muestra completa */
   .energy-flow {
     --progress: 1;
-  }
-  .energy-flow .mote {
-    opacity: 0.8;
   }
 }

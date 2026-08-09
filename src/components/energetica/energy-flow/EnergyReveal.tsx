@@ -1,8 +1,7 @@
 import FlorVidaEterna from "@/components/shared/svg/FlorVidaEterna";
-import GoldParticles from "./GoldParticles";
 
 /**
- * La ilustración de energía del Reporte Energético, en cuatro capas:
+ * La ilustración de energía del riel del Reporte Energético, en tres capas:
  *  1. fol-ghost — la Flor de la Vida completa, apenas insinuada (el estado
  *                 "incompleto"): el dibujo nunca desaparece del todo.
  *  2. fol-draw  — la misma flor, revelándose en círculo según --progress.
@@ -10,21 +9,14 @@ import GoldParticles from "./GoldParticles";
  *                 cónica; el mandala anterior era trazo y se "dibujaba" con
  *                 stroke-dashoffset, que aquí no aplica.
  *  3. fol-anillo — la pista y el haz que marcan la carga por fuera de la flor.
- *  4. mote      — motas doradas que derivan en bucle. Solo dentro del
- *                 cuestionario (`motas`): ahí el mandala está quieto y son lo
- *                 único que respira. En el riel de la landing sobran —compiten
- *                 con el revelado, que ya es todo el movimiento— y además
- *                 evitamos animar 18 círculos SVG en una sección donde cada
- *                 frame cuenta.
+ *
+ * Esto vive SOLO en el riel: es el medidor que se llena con el scroll. Dentro
+ * del cuestionario no aparece —ahí el fondo son únicamente las motas (ver
+ * GoldParticles)—, porque una flor completa y detenida detrás de 10 preguntas
+ * no aporta nada y compite con la pregunta.
  * Todo el comportamiento vive en el CSS de .energy-flow (globals.css).
  */
-export default function EnergyReveal({
-  className = "",
-  motas = false,
-}: {
-  className?: string;
-  motas?: boolean;
-}) {
+export default function EnergyReveal({ className = "" }: { className?: string }) {
   return (
     <div aria-hidden="true" className={`energy-flow relative ${className}`}>
       <FlorVidaEterna className="fol-ghost absolute inset-0 h-full w-full" />
@@ -58,8 +50,6 @@ export default function EnergyReveal({
           />
         </g>
       </svg>
-
-      {motas && <GoldParticles className="absolute inset-0 h-full w-full" />}
     </div>
   );
 }

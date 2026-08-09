@@ -1,6 +1,6 @@
 import Image from "next/image";
-import CtaButton from "@/components/shared/CtaButton";
 import BotanicalAccent from "@/components/shared/svg/BotanicalAccent";
+import CtaRecorridoGuiado from "./CtaRecorridoGuiado";
 
 /** Sección 1 — Hero (above the fold). */
 export default function Hero() {
@@ -51,9 +51,11 @@ export default function Hero() {
               más ancho y botón y nota quedan centrados entre sí, sin romper la
               alineación a la izquierda del resto de la columna. */}
           <div className="mt-8 inline-flex flex-col items-center">
-            <CtaButton href="#reporte" variant="primary" size="lg">
-              Conocer la energía de mi hogar
-            </CtaButton>
+            {/* No salta al Reporte: lo recorre. Mueve el scroll despacio por
+                todo el riel para que la animación se ejecute completa y las
+                tres frases se puedan leer, y termina en el campo de la ciudad.
+                Se cancela al primer gesto. Ver CtaRecorridoGuiado. */}
+            <CtaRecorridoGuiado>Conocer la energía de mi hogar</CtaRecorridoGuiado>
             {/* Serif ceremonial de marca, pero en minúscula y pequeña: no usa
                 `ceremonial-label` porque esa utilidad fuerza versalitas y
                 tracking amplio, y en versalitas esta nota pesaba más que el

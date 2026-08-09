@@ -179,14 +179,21 @@ section[id] {
 
 /* La carga (0..1). Una sola fuente para el revelado de la flor y para el haz,
    así los dos avanzan exactamente juntos. Completa en 0.48, cuando el mandala
-   termina de crecer y entra el formulario. */
+   termina de crecer y entra el formulario.
+   Arranca en 0 EXACTO, no en un mínimo: con un suelo de 0.04 quedaba visible
+   una esquirla de flor y un arco corto de haz antes de tocar el scroll, y lo
+   que se anuncia es un dibujo que se construye — no puede empezar empezado. */
 .energy-flow {
-  --carga: clamp(0.04, calc(var(--progress) / 0.48), 1);
+  --carga: clamp(0, calc(var(--progress) / 0.48), 1);
 }
 
-/* Capa fantasma: la flor completa, apenas insinuada (estado "incompleto") */
+/* Capa fantasma: la flor completa, apenas insinuada, para que las partes que
+   el barrido aún no descubre no sean un vacío.
+   Su opacidad va multiplicada por la carga porque si no, era ELLA la que
+   destripaba la animación: pintaba la flor entera desde el fotograma cero, así
+   que no quedaba nada por revelar. Ahora la insinuación también crece. */
 .energy-flow .fol-ghost {
-  opacity: 0.16;
+  opacity: calc(0.16 * var(--carga));
 }
 
 /* ── Revelado circular de la flor ──
@@ -219,12 +226,14 @@ section[id] {
 }
 
 /* ── Anillo exterior: el haz de luz ──
-   Una pista tenue fija y encima un haz cuya longitud crece con la carga.
-   Va por fuera de la flor, en su propio SVG. */
+   Una pista tenue y encima un haz cuya longitud crece con la carga.
+   Va por fuera de la flor, en su propio SVG.
+   La pista también entra con la carga, por lo mismo que la capa fantasma: un
+   círculo completo dibujado de entrada delata el tamaño final del mandala. */
 .energy-flow .fol-pista {
   stroke-dasharray: none;
   stroke-width: 1;
-  opacity: 0.3;
+  opacity: calc(0.3 * var(--carga));
 }
 .energy-flow .fol-haz circle {
   stroke-dasharray: 1;

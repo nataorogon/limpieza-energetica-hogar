@@ -33,7 +33,7 @@ const inter = Inter({
  */
 const TITULO = "Limpieza Energética del Hogar en 7 Días — Nata Orogon";
 const DESCRIPCION =
-  "Recupera la paz de tu hogar en 7 días con un método basado en Registros Akáshicos y activado con Lenguajes de Luz. Sin rituales complicados, 15 min al día.";
+  "Recupera la paz de tu hogar en 7 días con un protocolo de limpieza energética activado con Lenguajes de Luz. Sin rituales complicados, 15 min al día.";
 
 export const metadata: Metadata = {
   // metadataBase convierte las rutas relativas (og:image, canonical) en URLs

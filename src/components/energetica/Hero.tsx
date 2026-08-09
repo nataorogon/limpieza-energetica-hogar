@@ -47,12 +47,19 @@ export default function Hero() {
               secciones que argumentan. Quien ya viene decidido no pierde nada
               —el header es sticky y su botón apunta a #oferta en todo scroll—
               y quien no, deja su correo en vez de irse sin dejar rastro. */}
-          <div className="mt-8">
+          {/* inline-flex + items-center: el grupo se encoge al ancho de su hijo
+              más ancho y botón y nota quedan centrados entre sí, sin romper la
+              alineación a la izquierda del resto de la columna. */}
+          <div className="mt-8 inline-flex flex-col items-center">
             <CtaButton href="#reporte" variant="primary" size="lg">
               Conocer la energía de mi hogar
             </CtaButton>
-            <p className="mt-3 text-xs text-on-surface-variant">
-              Gratis · 10 preguntas · tu resultado al instante
+            {/* Serif ceremonial de marca, pero en minúscula y pequeña: no usa
+                `ceremonial-label` porque esa utilidad fuerza versalitas y
+                tracking amplio, y en versalitas esta nota pesaba más que el
+                botón. En minúscula acompaña sin competir. */}
+            <p className="mt-2 text-center font-ceremonial text-sm leading-snug text-on-surface-variant">
+              Test gratis · 10 preguntas · tu resultado al instante
             </p>
           </div>
         </div>

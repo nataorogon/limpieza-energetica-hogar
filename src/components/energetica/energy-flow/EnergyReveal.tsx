@@ -10,11 +10,21 @@ import GoldParticles from "./GoldParticles";
  *                 cónica; el mandala anterior era trazo y se "dibujaba" con
  *                 stroke-dashoffset, que aquí no aplica.
  *  3. fol-anillo — la pista y el haz que marcan la carga por fuera de la flor.
- *  4. mote      — motas doradas que aparecen con el progreso y, en fase activa
- *                 (data-state del ancestro), derivan en bucle.
+ *  4. mote      — motas doradas que derivan en bucle. Solo dentro del
+ *                 cuestionario (`motas`): ahí el mandala está quieto y son lo
+ *                 único que respira. En el riel de la landing sobran —compiten
+ *                 con el revelado, que ya es todo el movimiento— y además
+ *                 evitamos animar 18 círculos SVG en una sección donde cada
+ *                 frame cuenta.
  * Todo el comportamiento vive en el CSS de .energy-flow (globals.css).
  */
-export default function EnergyReveal({ className = "" }: { className?: string }) {
+export default function EnergyReveal({
+  className = "",
+  motas = false,
+}: {
+  className?: string;
+  motas?: boolean;
+}) {
   return (
     <div aria-hidden="true" className={`energy-flow relative ${className}`}>
       <FlorVidaEterna className="fol-ghost absolute inset-0 h-full w-full" />
@@ -49,7 +59,7 @@ export default function EnergyReveal({ className = "" }: { className?: string })
         </g>
       </svg>
 
-      <GoldParticles className="absolute inset-0 h-full w-full" />
+      {motas && <GoldParticles className="absolute inset-0 h-full w-full" />}
     </div>
   );
 }

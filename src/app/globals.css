@@ -177,55 +177,72 @@ section[id] {
 /* Ojo: .energy-flow NO declara --progress. Si lo hiciera, cortaría la herencia
    y el mandala dejaría de responder al riel de scroll que lo contiene. */
 
-/* Capa fantasma: el mandala completo, apenas insinuado (estado "incompleto") */
-.energy-flow .fol-ghost {
-  color: var(--color-oro-200);
-  opacity: 0.35;
+/* La carga (0..1). Una sola fuente para el revelado de la flor y para el haz,
+   así los dos avanzan exactamente juntos. Completa en 0.48, cuando el mandala
+   termina de crecer y entra el formulario. */
+.energy-flow {
+  --carga: clamp(0.04, calc(var(--progress) / 0.48), 1);
 }
 
-/* Capa de dibujado: cada anillo se traza según --progress, con stagger
-   centro→afuera. pathLength=1 en el SVG hace que esto sea pura aritmética. */
-.energy-flow .fol-draw circle {
-  stroke-dasharray: 1;
+/* Capa fantasma: la flor completa, apenas insinuada (estado "incompleto") */
+.energy-flow .fol-ghost {
+  opacity: 0.16;
 }
-.energy-flow .fol-draw .fol-g1 circle {
-  stroke-dashoffset: clamp(0, calc(1 - var(--progress) / 0.4), 1);
+
+/* ── Revelado circular de la flor ──
+   La Flor de la Vida de marca es UN PATH RELLENO: sus líneas son contornos,
+   no trazos, así que no se puede "dibujar" con stroke-dashoffset como el
+   mandala anterior. Se descubre con una máscara cónica que abre en sentido
+   horario desde las 12 — el mismo gesto y el mismo arranque que el haz.
+   `from 0deg` y no -90deg: en conic-gradient el 0° YA está arriba y los
+   ángulos crecen en horario. Poner -90deg lo arrancaba a las 9 en punto,
+   desfasado media vuelta del haz (que sí necesita -90deg, porque el path de
+   un <circle> de SVG empieza a las 3).
+   El vértice va en `at 50% 50%`, que es donde convergen los 12 círculos de la
+   flor: el barrido los va descubriendo uno a uno en vez de cortarlos por la
+   mitad. Depende de que el contenedor sea cuadrado (lo es: --lado en el riel,
+   min(92vw,84dvh) en el takeover) y de que el SVG use xMidYMid.
+   Los 0.03turn de borde suave evitan que el frente se vea como un corte. */
+.energy-flow .fol-draw {
+  -webkit-mask-image: conic-gradient(
+    from 0deg at 50% 50%,
+    #000 0turn,
+    #000 calc(var(--carga) * 1turn - 0.03turn),
+    transparent calc(var(--carga) * 1turn)
+  );
+  mask-image: conic-gradient(
+    from 0deg at 50% 50%,
+    #000 0turn,
+    #000 calc(var(--carga) * 1turn - 0.03turn),
+    transparent calc(var(--carga) * 1turn)
+  );
 }
-.energy-flow .fol-draw .fol-g2 circle {
-  stroke-dashoffset: clamp(0, calc(1 - (var(--progress) - 0.15) / 0.45), 1);
-}
-.energy-flow .fol-draw .fol-g3 circle {
-  stroke-dashoffset: clamp(0, calc(1 - (var(--progress) - 0.3) / 0.55), 1);
-}
+
 /* ── Anillo exterior: el haz de luz ──
-   Antes eran dos círculos que no empezaban a dibujarse hasta la mitad del
-   riel. Ahora arrancan con el primer scroll, igual que el centro, y en vez de
-   trazarse se comportan como una carga circular: una pista tenue fija, y
-   encima un haz cuya longitud crece con --progress mientras gira. */
-.energy-flow .fol-draw .fol-pista {
+   Una pista tenue fija y encima un haz cuya longitud crece con la carga.
+   Va por fuera de la flor, en su propio SVG. */
+.energy-flow .fol-pista {
   stroke-dasharray: none;
+  stroke-width: 1;
   opacity: 0.3;
 }
-.energy-flow .fol-draw .fol-haz circle {
-  /* Mínimo 0.05 para que en el arranque ya haya una chispa girando, no nada.
-     Completa en 0.48, cuando el mandala termina de crecer y entra el form. */
-  --carga: clamp(0.05, calc(var(--progress) / 0.48), 1);
+.energy-flow .fol-haz circle {
   stroke-dasharray: 1;
   stroke-dashoffset: calc(1 - var(--carga));
   stroke-linecap: round;
 }
-.energy-flow .fol-draw .fol-haz-halo {
+.energy-flow .fol-haz-halo {
   stroke-width: 5;
   opacity: 0.4;
 }
-.energy-flow .fol-draw .fol-haz-nucleo {
+.energy-flow .fol-haz-nucleo {
   stroke-width: 1.6;
 }
 /* Rotación ESTÁTICA de -90°: mueve el origen del trazo de las 3 a las 12, así
    la carga arranca arriba y avanza en sentido horario, como cualquier medidor.
    Sin animación propia a propósito: el haz avanza SOLO con el scroll. Un giro
    infinito se lee como "esperando", no como "cargando con lo que haces". */
-.energy-flow .fol-draw .fol-haz {
+.energy-flow .fol-haz {
   transform-box: fill-box;
   transform-origin: center;
   transform: rotate(-90deg);
@@ -238,14 +255,6 @@ section[id] {
 
 /* Fase activa (tras el CTA): el linework "respira" con un brillo que
    recorre los trazos, y las motas derivan en bucles suaves */
-@keyframes stroke-shimmer {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: -1;
-  }
-}
 @keyframes mote-drift {
   0%,
   100% {
@@ -258,24 +267,20 @@ section[id] {
   }
 }
 
-/* Fase "activating" (los ~450ms del CTA): el linework cobra vida una sola vez. */
-[data-state="activating"] .energy-flow .fol-draw circle {
-  stroke-dasharray: 0.85 0.15;
-  stroke-dashoffset: 0;
-  animation: stroke-shimmer 3.2s linear infinite;
+/* Fases "activating" (los ~450ms del CTA) y "form" (dentro del cuestionario):
+   la flor se completa y se queda QUIETA. Nada de recorrer los trazos mientras
+   se contestan 10 preguntas — eso se lee como un cronómetro, no como calma.
+   Solo las motas siguen derivando. */
+[data-state="activating"] .energy-flow,
+[data-state="form"] .energy-flow {
+  --carga: 1;
 }
-
-/* Fase "form" (dentro del takeover): el mandala queda QUIETO y completo.
-   El shimmer recorriendo los trazos mientras se contestan 10 preguntas se
-   lee como un cronómetro, no como calma. Solo las motas siguen derivando. */
-[data-state="form"] .energy-flow .fol-draw circle {
-  stroke-dasharray: none;
-  stroke-dashoffset: 0;
-  animation: none;
+[data-state="activating"] .energy-flow .fol-draw,
+[data-state="form"] .energy-flow .fol-draw {
+  -webkit-mask-image: none;
+  mask-image: none;
 }
-/* Dentro del takeover el haz ya está completo (la regla de arriba le pone
-   dashoffset 0) y la pista sube a plena opacidad: anillo exterior cerrado. */
-[data-state="form"] .energy-flow .fol-draw .fol-pista {
+[data-state="form"] .energy-flow .fol-pista {
   opacity: 1;
 }
 

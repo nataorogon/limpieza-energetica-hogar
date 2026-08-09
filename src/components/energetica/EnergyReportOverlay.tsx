@@ -106,7 +106,12 @@ export default function EnergyReportOverlay({
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 grid place-items-center opacity-45"
       >
-        <EnergyReveal className="h-[min(92vw,84dvh)] w-[min(92vw,84dvh)]" />
+        {/* Con motas: aquí el mandala está quieto y ellas son lo único que
+            se mueve. En el riel de la landing no van. */}
+        <EnergyReveal
+          motas
+          className="h-[min(92vw,84dvh)] w-[min(92vw,84dvh)]"
+        />
       </div>
       <div aria-hidden="true" className="report-scrim absolute inset-0" />
 

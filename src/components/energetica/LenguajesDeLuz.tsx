@@ -1,5 +1,5 @@
 import SectionEyebrow from "@/components/shared/SectionEyebrow";
-import FlowerOfLife from "@/components/shared/svg/FlowerOfLife";
+import FlorVidaEterna from "@/components/shared/svg/FlorVidaEterna";
 
 const CAPAS = [
   "elevar la frecuencia del espacio,",
@@ -15,7 +15,7 @@ export default function LenguajesDeLuz() {
       aria-labelledby="lenguajes-titulo"
       className="relative overflow-hidden bg-surface-variant/60 py-16 md:py-24"
     >
-      <FlowerOfLife className="pointer-events-none absolute -right-24 top-1/2 h-96 w-96 -translate-y-1/2 opacity-[0.14]" />
+      <FlorVidaEterna className="pointer-events-none absolute -right-24 top-1/2 h-96 w-96 -translate-y-1/2 opacity-[0.14]" />
       <div className="relative mx-auto max-w-3xl px-4 sm:px-6">
         <SectionEyebrow>Lenguajes de Luz</SectionEyebrow>
         <h2

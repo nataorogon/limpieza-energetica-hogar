@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import CtaButton from "@/components/shared/CtaButton";
 import GoldDivider from "@/components/shared/GoldDivider";
 import SectionEyebrow from "@/components/shared/SectionEyebrow";
-import FlowerOfLife from "@/components/shared/svg/FlowerOfLife";
+import FlorVidaEterna from "@/components/shared/svg/FlorVidaEterna";
 import CompartirReporte from "@/components/reporte/CompartirReporte";
 import RecorridoEnergia from "@/components/reporte/RecorridoEnergia";
 import ResultadosModulos from "@/components/reporte/ResultadosModulos";
@@ -78,9 +78,9 @@ export default async function ReportePage({ searchParams }: Props) {
     <>
       {/* ── Portada personalizada ─────────────────────────────────────── */}
       <section className="relative overflow-hidden py-16 text-center md:py-24">
-        {/* FlowerOfLife directo, no EnergyReveal: fuera de .energy-flow el
-            mandala se dibuja completo, que es lo que queremos de marca de agua. */}
-        <FlowerOfLife className="pointer-events-none absolute left-1/2 top-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 -translate-y-1/2 opacity-[0.07]" />
+        {/* La flor directa, no EnergyReveal: fuera de .energy-flow no hay
+            máscara de revelado, así que se ve completa — marca de agua. */}
+        <FlorVidaEterna className="pointer-events-none absolute left-1/2 top-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 -translate-y-1/2 opacity-[0.07]" />
         <div className="relative mx-auto max-w-3xl px-4 sm:px-6">
           <SectionEyebrow>El Reporte Energético</SectionEyebrow>
           <h1 className="mt-5 font-display text-3xl font-medium leading-tight text-on-surface sm:text-4xl lg:text-5xl">

@@ -185,6 +185,13 @@ section[id] {
    que se anuncia es un dibujo que se construye — no puede empezar empezado. */
 .energy-flow {
   --carga: clamp(0, calc(var(--progress) / 0.726), 1);
+  /* Ancho del frente suave del barrido. Se mantiene en 0.03turn (~11°) durante
+     todo el giro y se cierra a 0 en el último 15% de la carga.
+     Si se deja fijo, al completarse queda una cuña de ~11° a medio borrar entre
+     el final del giro y las 12 —donde el degradado cónica vuelve a empezar—, y
+     por debajo asoma la capa fantasma: se ve como un rayo del centro al
+     perímetro sobre un mandala que ya debería estar entero. */
+  --suave: calc(0.03turn * clamp(0, calc((1 - var(--carga)) / 0.15), 1));
 }
 
 /* Capa fantasma: la flor completa, apenas insinuada, para que las partes que
@@ -208,20 +215,25 @@ section[id] {
    El vértice va en `at 50% 50%`, que es donde convergen los 12 círculos de la
    flor: el barrido los va descubriendo uno a uno en vez de cortarlos por la
    mitad. Depende de que el contenedor sea cuadrado (lo es: --lado en el riel,
-   min(92vw,84dvh) en el takeover) y de que el SVG use xMidYMid.
-   Los 0.03turn de borde suave evitan que el frente se vea como un corte. */
+   min(92vw,84dvh) en el riel) y de que el SVG use xMidYMid.
+   El borde suave lo da --suave, que se cierra a 0 al completarse la carga para
+   que no quede costura en las 12 (ver .energy-flow). El 1.004turn del final es
+   la misma precaución llevada al límite: con 1turn justo, el último stop cae
+   exactamente sobre el punto donde el degradado vuelve a empezar y algunos
+   navegadores dejan ahí una línea de un píxel al interpolar. Con el pelín de
+   más, al completarse la máscara es opaca en toda la vuelta. */
 .energy-flow .fol-draw {
   -webkit-mask-image: conic-gradient(
     from 0deg at 50% 50%,
     #000 0turn,
-    #000 calc(var(--carga) * 1turn - 0.03turn),
-    transparent calc(var(--carga) * 1turn)
+    #000 calc(var(--carga) * 1.004turn - var(--suave)),
+    transparent calc(var(--carga) * 1.004turn)
   );
   mask-image: conic-gradient(
     from 0deg at 50% 50%,
     #000 0turn,
-    #000 calc(var(--carga) * 1turn - 0.03turn),
-    transparent calc(var(--carga) * 1turn)
+    #000 calc(var(--carga) * 1.004turn - var(--suave)),
+    transparent calc(var(--carga) * 1.004turn)
   );
 }
 

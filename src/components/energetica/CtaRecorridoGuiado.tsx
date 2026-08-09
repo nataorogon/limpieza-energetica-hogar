@@ -28,7 +28,7 @@ const ID_RIEL = "reporte";
  * Si hay que ajustar el ritmo, es aquí y en un solo sitio.
  */
 const ACERCAMIENTO = 700;
-const LECTURA_INICIAL = 1500;
+const LECTURA_INICIAL = 1000;
 const RECORRIDO = 7500;
 
 const FIN_ACERCAMIENTO = ACERCAMIENTO;

@@ -11,7 +11,7 @@ import EnergyReveal from "./energy-flow/EnergyReveal";
 type Phase = "idle" | "activating" | "form";
 
 const TITLE_ID = "reporte-titulo";
-const TITLE = "El Reporte Energético";
+const TITLE = "Recibe tu Reporte Energético";
 /** Una sola fuente: el placeholder real y la copia invisible que sitúa el caret
  *  tienen que medir lo mismo, o el caret se descoloca. */
 const PLACEHOLDER_CIUDAD = "[ Tu Ciudad ]";
@@ -142,7 +142,7 @@ export default function EnergyReportSection() {
             {TITLE}
           </p>
           <p className="mt-6 font-display text-3xl font-medium leading-tight text-on-surface sm:text-5xl lg:text-6xl">
-            Toda casa acumula lo que vivió.
+            Sabías que toda casa acumula lo que vivió.
             <span className="block text-secondary">La tuya también.</span>
           </p>
         </div>

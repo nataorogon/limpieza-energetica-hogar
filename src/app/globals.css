@@ -418,6 +418,40 @@ section[id] {
   pointer-events: auto;
 }
 
+/* ── Caret decorativo del campo de ciudad ──
+   Titila como el caret del sistema —salto duro con steps(), no un fundido, y
+   1.06s, que es el periodo que usan los navegadores— para que se lea como un
+   campo activo y no como un adorno que respira.
+   Se apaga en cuanto el campo tiene foco (ahí aparece el caret de verdad y dos
+   cursores a la vez es confuso) o ya tiene texto escrito. Todo con selectores
+   de hermano: no hace falta estado en React, así que el riel sigue sin
+   re-renderizar por esto. :placeholder-shown depende de que el input conserve
+   su atributo placeholder. */
+@keyframes caret-titila {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.pista-cursor {
+  animation: caret-titila 1.06s steps(1, end) infinite;
+}
+.campo-ciudad:focus ~ .pista-ciudad,
+.campo-ciudad:not(:placeholder-shown) ~ .pista-ciudad {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Sin titileo, pero el caret se queda visible: es la pista de que ahí se
+     escribe, no un efecto del que se pueda prescindir. */
+  .pista-cursor {
+    animation: none;
+  }
+}
+
 /* El CTA se llena de color mientras entra: gana presencia a la vez que el
    formulario aparece, y queda a tope justo cuando el bloque es legible. */
 .report-cta {

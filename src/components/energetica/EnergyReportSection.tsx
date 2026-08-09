@@ -12,6 +12,9 @@ type Phase = "idle" | "activating" | "form";
 
 const TITLE_ID = "reporte-titulo";
 const TITLE = "El Reporte Energético";
+/** Una sola fuente: el placeholder real y la copia invisible que sitúa el caret
+ *  tienen que medir lo mismo, o el caret se descoloca. */
+const PLACEHOLDER_CIUDAD = "[ Tu Ciudad ]";
 
 /**
  * Dónde arranca cada texto dentro del riel (0..1). El CSS los cruza con una
@@ -176,15 +179,36 @@ export default function EnergyReportSection() {
             >
               Yo vivo en
             </label>
-            <input
-              id="ciudad-inline"
-              type="text"
-              autoComplete="address-level2"
-              value={ciudad}
-              onChange={(e) => setCiudad(e.target.value)}
-              placeholder="[ Tu Ciudad ]"
-              className="mt-3 w-full border-b border-outline bg-transparent pb-2 text-center font-display text-3xl text-on-surface placeholder:text-outline focus:border-secondary focus:outline-none sm:text-5xl"
-            />
+            {/* El campo va centrado y vacío, y sin foco el navegador no dibuja
+                caret: se leía como un rótulo más, no como algo donde escribir.
+                Debajo del input va un caret decorativo que titila, y que se
+                apaga solo (CSS, ver .pista-ciudad) en cuanto hay foco —ahí manda
+                el caret de verdad— o ya hay texto escrito. */}
+            <div className="relative mt-3">
+              <input
+                id="ciudad-inline"
+                type="text"
+                autoComplete="address-level2"
+                value={ciudad}
+                onChange={(e) => setCiudad(e.target.value)}
+                placeholder={PLACEHOLDER_CIUDAD}
+                className="campo-ciudad w-full border-b border-outline bg-transparent pb-2 text-center font-display text-3xl text-on-surface placeholder:text-outline focus:border-secondary focus:outline-none sm:text-5xl"
+              />
+              {/* La copia invisible del placeholder no es un adorno: se centra
+                  igual que el de verdad —misma cadena, misma tipografía, mismo
+                  centrado—, así que colgando el caret de su borde izquierdo cae
+                  exactamente delante del texto sin medir nada en JS, y sigue
+                  cayendo bien si cambia la fuente o el copy. */}
+              <span
+                aria-hidden="true"
+                className="pista-ciudad pointer-events-none absolute inset-0 flex items-center justify-center pb-2 font-display text-3xl sm:text-5xl"
+              >
+                <span className="relative">
+                  <span className="opacity-0">{PLACEHOLDER_CIUDAD}</span>
+                  <span className="pista-cursor absolute right-full top-1/2 mr-[0.18em] h-[1em] w-[2px] -translate-y-1/2 rounded-full bg-secondary" />
+                </span>
+              </span>
+            </div>
             <div className="mt-10">
               <CtaButton
                 type="submit"

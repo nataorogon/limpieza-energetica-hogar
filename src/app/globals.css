@@ -178,13 +178,13 @@ section[id] {
    y el mandala dejaría de responder al riel de scroll que lo contiene. */
 
 /* La carga (0..1). Una sola fuente para el revelado de la flor y para el haz,
-   así los dos avanzan exactamente juntos. Completa en 0.44; de ahí a 0.55 el
+   así los dos avanzan exactamente juntos. Completa en 0.726; de ahí a 0.909 el
    dibujo entero se disuelve (ver --disolucion en .report-pin).
    Arranca en 0 EXACTO, no en un mínimo: con un suelo de 0.04 quedaba visible
    una esquirla de flor y un arco corto de haz antes de tocar el scroll, y lo
    que se anuncia es un dibujo que se construye — no puede empezar empezado. */
 .energy-flow {
-  --carga: clamp(0, calc(var(--progress) / 0.44), 1);
+  --carga: clamp(0, calc(var(--progress) / 0.726), 1);
 }
 
 /* Capa fantasma: la flor completa, apenas insinuada, para que las partes que
@@ -296,14 +296,21 @@ section[id] {
    una sola frase a la vez.
    ══════════════════════════════════════════════════════════════════ */
 
-/* Más largo de lo que pide el contenido: el último tramo (mandala completo +
-   formulario) tiene que sostenerse en pantalla mientras se sigue bajando. */
+/* El riel mide exactamente lo que dura la animación, ni un píxel más. Tres
+   tramos repartidos 8:2:1 —carga, disolución, entrada del formulario— y el
+   último acaba en 1, así que el panel se despega en el mismo momento en que el
+   CTA termina de tomar color.
+   Antes sobraba un 34% de riel después de eso: pantalla sujeta sin que pasara
+   nada visible, que es justo lo que hace que uno no sepa si tiene que seguir
+   bajando o si el scroll se trabó. Por eso las alturas bajaron de 320/480svh a
+   233/330svh. La carga conserva los mismos píxeles que tenía —es el tramo que
+   vale la pena— y lo que se recortó es la cola y la mitad de la entrada. */
 .report-riel {
-  min-height: 320svh;
+  min-height: 233svh;
 }
 @media (min-width: 1024px) {
   .report-riel {
-    min-height: 480svh;
+    min-height: 330svh;
   }
 }
 
@@ -319,38 +326,33 @@ section[id] {
   height: 100svh;
   width: 100%;
   overflow: hidden;
-  /* Vaciado del panel antes de que se despegue. Un panel pegado deja de estarlo
-     al llegar al fondo de su riel, y en ese instante lo que tenga puesto sube
-     junto con la página: el mandala mide 72dvh, así que su mitad inferior
-     quedaba encima de la sección siguiente y las dos se leían encimadas.
-     Se apaga el fondo en el último tramo para que el panel se suelte vacío.
-     Solo el fondo — el formulario y el CTA siguen enteros hasta el final. */
-  --salida: clamp(0, calc((var(--progress) - 0.88) / 0.12), 1);
-  /* La disolución del mandala: de 0.44 —donde acaba de cargarse— a 0.55, donde
+  /* Aquí había un --salida (0.88 → 1) que apagaba el fondo antes de que el panel
+     se despegara: el mandala mide 72dvh y al soltarse subía con la página,
+     encimándose con la sección siguiente. Ya no hace falta — el mandala se
+     disuelve del todo en 0.8333, mucho antes del final del riel, así que el
+     panel se suelta con el fondo vacío por construcción. */
+  /* La disolución del mandala: de 0.726 —donde acaba de cargarse— a 0.909, donde
      entra el texto de la ciudad. Se declara aquí, en el padre, y no en
      .report-arte, porque el scrim tiene que irse con él y es su hermano: las
      custom properties heredan hacia abajo, no de lado. */
-  --disolucion: clamp(0, calc((var(--progress) - 0.44) / 0.11), 1);
+  --disolucion: clamp(0, calc((var(--progress) - 0.726) / 0.183), 1);
 }
 
 /* El mandala crece con el scroll — y SIEMPRE completo: el lado base está
    limitado al viewport, así que no se recorta. Empieza a formarse con el primer
-   scroll —junto con el primer texto— y termina de crecer en 0.44.
+   scroll —junto con el primer texto— y termina de crecer en 0.726.
    Y ahí NO se queda quieto: se disuelve expandiéndose desde el centro, y
-   termina de irse en 0.55, exactamente donde entra el texto de la ciudad. Ese
+   termina de irse en 0.909, exactamente donde entra el texto de la ciudad. Ese
    texto lleva un input y un botón, y compartir el fondo con un mandala del
    tamaño del viewport le quita el sitio; además el gesto de expandirse-y-
    desaparecer cierra la carga en vez de dejarla colgada. La escala pasa de 1 a
    1.45 mientras la opacidad cae, que es lo que se lee como dispersarse. */
 .report-arte {
   --lado: min(84vw, 72svh);
-  --crecimiento: clamp(0, calc(var(--progress) / 0.44), 1);
+  --crecimiento: clamp(0, calc(var(--progress) / 0.726), 1);
   width: var(--lado);
   height: var(--lado);
-  opacity: calc(
-    (0.85 - 0.3 * var(--crecimiento)) * (1 - var(--disolucion, 0)) *
-      (1 - var(--salida, 0))
-  );
+  opacity: calc((0.85 - 0.3 * var(--crecimiento)) * (1 - var(--disolucion, 0)));
   transform: scale(calc(0.4 + 0.6 * var(--crecimiento) + 0.45 * var(--disolucion, 0)))
     rotate(calc(var(--crecimiento) * 20deg));
   /* z-index explícito + pointer-events: will-change/transform crean stacking
@@ -364,10 +366,9 @@ section[id] {
 .report-pin .report-scrim {
   position: relative;
   z-index: 1;
-  /* Se va con el mandala —en la disolución y en la salida—: un lavado radial
-     sobre fondo vacío se nota, y deja el centro del panel más claro que los
-     bordes sin nada que justificarlo. */
-  opacity: calc((1 - var(--disolucion, 0)) * (1 - var(--salida, 0)));
+  /* Se va con el mandala: un lavado radial sobre fondo vacío se nota, y deja el
+     centro del panel más claro que los bordes sin nada que lo justifique. */
+  opacity: calc(1 - var(--disolucion, 0));
 }
 
 /* Cada texto entra y sale por su ventana [--desde, --hasta], con una rampa a
@@ -376,7 +377,11 @@ section[id] {
    los clics del de abajo: por defecto ninguno los recibe y React se los
    devuelve (pointer-events-auto + inert) solo al que manda. */
 .report-beat {
-  --rampa: 0.11;
+  /* Valor por defecto; cada beat manda el suyo por style (ver VENTANAS). El
+     tercero usa una rampa más corta a propósito: entra y toma color en la mitad
+     de scroll que los otros, porque en ese tramo la única cosa que se mueve es
+     él y estirarlo se sentía como pantalla trabada. */
+  --rampa: 0.183;
   --entra: clamp(0, calc((var(--progress) - var(--desde)) / var(--rampa)), 1);
   --sale: clamp(0, calc((var(--hasta) - var(--progress)) / var(--rampa)), 1);
   opacity: min(var(--entra), var(--sale));
@@ -401,8 +406,8 @@ section[id] {
   pointer-events: auto;
 }
 
-/* El CTA se va llenando de color durante el tramo final: mientras la persona
-   sigue bajando y la pantalla se sostiene, el botón gana presencia. */
+/* El CTA se llena de color mientras entra: gana presencia a la vez que el
+   formulario aparece, y queda a tope justo cuando el bloque es legible. */
 .report-cta {
   position: relative;
   isolation: isolate;
@@ -416,8 +421,12 @@ section[id] {
   z-index: -1;
   border-radius: inherit;
   background-image: var(--gradient-cta);
-  /* Arranca justo después de que el formulario termina de entrar (0.59) */
-  opacity: clamp(0, calc((var(--progress) - 0.62) / 0.18), 1);
+  /* Exactamente la ventana de entrada del tercer beat: 0.909 + 0.085. El color
+     acaba de llenarse justo antes del final del riel, que es donde el panel se
+     despega — así el llenado no pide scroll de más y no queda ningún tramo con
+     el botón pálido esperando. Si se cambia la rampa del tercer beat
+     (EnergyReportSection, VENTANAS) hay que cambiar este 0.085 con ella. */
+  opacity: clamp(0, calc((var(--progress) - 0.909) / 0.085), 1);
 }
 
 /* ══════════════════════════════════════════════════════════════════

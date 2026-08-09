@@ -19,18 +19,18 @@ const TITLE = "El Reporte Energético";
  * lo que hace que la atención caiga sobre una sola frase a la vez.
  */
 /** El relevo: donde uno acaba de apagarse y el siguiente empieza a encenderse. */
-const BEATS = [0, 0.13, 0.55] as const;
+const BEATS = [0, 0.217, 0.909] as const;
 
 /**
- * desde/hasta de cada texto. Tres reglas gobiernan estos números:
+ * desde/hasta/rampa de cada texto. El riel se reparte 8:2:1 —carga del mandala,
+ * disolución, entrada del formulario— y cuatro reglas gobiernan estos números:
  *
- * 1. SIN ESPERA. El primero empieza a irse en 0.02 —el primer gesto de scroll—,
- *    no después. Antes aguantaba quieto hasta 0.25, que en un riel de 480svh
- *    son ~95svh: un viewport entero sin que pasara nada. Su `desde` es -0.11
- *    (= -rampa) para que ya esté al 100% al llegar.
+ * 1. SIN ESPERA. El primero empieza a irse en 0.034 —el primer gesto de scroll—,
+ *    no después. Antes aguantaba quieto hasta 0.25: un viewport entero sin que
+ *    pasara nada. Su `desde` es -rampa para que ya esté al 100% al llegar.
  *
  * 2. RELEVO EXACTO, SIN SUPERPOSICIÓN. El `desde` de cada uno es el `hasta` del
- *    anterior (0.13 y 0.55). En ese punto ambos valen 0 —un instante, no un
+ *    anterior (0.217 y 0.909). En ese punto ambos valen 0 —un instante, no un
  *    tramo—, así que nunca se ven dos textos encimados y tampoco queda
  *    pantalla vacía. Van apilados en la misma celda: si se cruzaran a media
  *    opacidad serían una mancha ilegible.
@@ -38,26 +38,35 @@ const BEATS = [0, 0.13, 0.55] as const;
  * 3. TODOS ENTRAN DESVANECIDOS. Ninguno aparece de golpe; el que llega sube
  *    desde abajo mientras se enciende.
  *
- * El segundo llega hasta 0.55 y no hasta 0.44 —donde el mandala acaba de
- * cargarse— a propósito: entre 0.44 y 0.55 el mandala se disuelve expandiéndose
- * (--disolucion en globals.css) para que el tercer texto entre sobre fondo
- * limpio. Si el segundo se apagara en 0.44, ese tramo sería pantalla vacía con
- * un mandala desvaneciéndose y nada que leer; así se van juntos, y la
- * disolución es el gesto de cierre de esa frase en vez de un hueco.
+ * 4. RAMPA PROPIA POR BEAT. Los dos primeros usan 0.183; el tercero, 0.085 —menos
+ *    de la mitad—. En su tramo lo único que se mueve es él (el mandala ya se
+ *    fue), y estirarlo obligaba a seguir bajando sin nada que lo justificara: se
+ *    sentía como que el scroll no respondía. Entra rápido y el riel termina.
+ *    0.085 y no 0.091 (= 1 - 0.909) para que acabe de entrar unos píxeles ANTES
+ *    del final del riel y no justo en el último, donde --progress solo llega a 1
+ *    en el píxel exacto del fondo.
  *
- * El último no se apaga: entra en 0.55 y deja ~33% del riel de permanencia
- * para que el formulario se sostenga mientras se sigue bajando.
+ * El segundo llega hasta 0.909 y no hasta 0.726 —donde el mandala acaba de
+ * cargarse— a propósito: entre esos dos puntos el mandala se disuelve
+ * expandiéndose (--disolucion en globals.css) para que el tercer texto entre
+ * sobre fondo limpio. Si el segundo se apagara en 0.726, ese tramo sería
+ * pantalla vacía con un mandala desvaneciéndose y nada que leer; así se van
+ * juntos, y la disolución es el gesto de cierre de esa frase en vez de un hueco.
+ *
+ * El último no se apaga y termina de entrar justo en 1, que es donde el panel
+ * deja de estar pegado: el formulario acaba de formarse y el riel lo suelta.
  */
 const VENTANAS = [
-  { desde: -0.11, hasta: 0.13 },
-  { desde: 0.13, hasta: 0.55 },
-  { desde: 0.55, hasta: 99 },
+  { desde: -0.183, hasta: 0.217, rampa: 0.183 },
+  { desde: 0.217, hasta: 0.909, rampa: 0.183 },
+  { desde: 0.909, hasta: 99, rampa: 0.085 },
 ];
 
 function ventana(i: number): CSSProperties {
   return {
     "--desde": VENTANAS[i].desde,
     "--hasta": VENTANAS[i].hasta,
+    "--rampa": VENTANAS[i].rampa,
   } as CSSProperties;
 }
 

@@ -19,7 +19,7 @@ const TITLE = "El Reporte Energético";
  * lo que hace que la atención caiga sobre una sola frase a la vez.
  */
 /** El relevo: donde uno acaba de apagarse y el siguiente empieza a encenderse. */
-const BEATS = [0, 0.13, 0.48] as const;
+const BEATS = [0, 0.13, 0.55] as const;
 
 /**
  * desde/hasta de cada texto. Tres reglas gobiernan estos números:
@@ -30,7 +30,7 @@ const BEATS = [0, 0.13, 0.48] as const;
  *    (= -rampa) para que ya esté al 100% al llegar.
  *
  * 2. RELEVO EXACTO, SIN SUPERPOSICIÓN. El `desde` de cada uno es el `hasta` del
- *    anterior (0.13 y 0.48). En ese punto ambos valen 0 —un instante, no un
+ *    anterior (0.13 y 0.55). En ese punto ambos valen 0 —un instante, no un
  *    tramo—, así que nunca se ven dos textos encimados y tampoco queda
  *    pantalla vacía. Van apilados en la misma celda: si se cruzaran a media
  *    opacidad serían una mancha ilegible.
@@ -38,13 +38,20 @@ const BEATS = [0, 0.13, 0.48] as const;
  * 3. TODOS ENTRAN DESVANECIDOS. Ninguno aparece de golpe; el que llega sube
  *    desde abajo mientras se enciende.
  *
- * El último no se apaga: entra en 0.48 y deja ~40% del riel de permanencia
+ * El segundo llega hasta 0.55 y no hasta 0.44 —donde el mandala acaba de
+ * cargarse— a propósito: entre 0.44 y 0.55 el mandala se disuelve expandiéndose
+ * (--disolucion en globals.css) para que el tercer texto entre sobre fondo
+ * limpio. Si el segundo se apagara en 0.44, ese tramo sería pantalla vacía con
+ * un mandala desvaneciéndose y nada que leer; así se van juntos, y la
+ * disolución es el gesto de cierre de esa frase en vez de un hueco.
+ *
+ * El último no se apaga: entra en 0.55 y deja ~33% del riel de permanencia
  * para que el formulario se sostenga mientras se sigue bajando.
  */
 const VENTANAS = [
   { desde: -0.11, hasta: 0.13 },
-  { desde: 0.13, hasta: 0.48 },
-  { desde: 0.48, hasta: 99 },
+  { desde: 0.13, hasta: 0.55 },
+  { desde: 0.55, hasta: 99 },
 ];
 
 function ventana(i: number): CSSProperties {
